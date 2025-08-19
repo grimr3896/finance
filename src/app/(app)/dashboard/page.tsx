@@ -1,4 +1,5 @@
 "use client";
+import { useState, useEffect } from "react";
 import { DollarSign, Users, Beer, TrendingUp } from "lucide-react";
 import {
   Card,
@@ -19,16 +20,6 @@ import { Badge } from "@/components/ui/badge";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import type { Sale } from "@/lib/types";
 
-const salesData = [
-  { name: "Mon", total: Math.floor(Math.random() * 2000) + 1000 },
-  { name: "Tue", total: Math.floor(Math.random() * 2000) + 1000 },
-  { name: "Wed", total: Math.floor(Math.random() * 2000) + 1000 },
-  { name: "Thu", total: Math.floor(Math.random() * 2000) + 1000 },
-  { name: "Fri", total: Math.floor(Math.random() * 2000) + 1000 },
-  { name: "Sat", total: Math.floor(Math.random() * 2000) + 1000 },
-  { name: "Sun", total: Math.floor(Math.random() * 2000) + 1000 },
-];
-
 const recentSales: Sale[] = [
     { id: "SALE001", items: [{ drinkName: 'Tusker', quantity: 2, price: 400}], total: 400, paymentMethod: 'Mpesa', cashier: 'John D.', timestamp: '2024-08-19 10:30 PM'},
     { id: "SALE002", items: [{ drinkName: 'Drum (250ml)', quantity: 1, price: 220}], total: 220, paymentMethod: 'Cash', cashier: 'Jane S.', timestamp: '2024-08-19 10:25 PM'},
@@ -39,6 +30,20 @@ const recentSales: Sale[] = [
 
 
 export default function DashboardPage() {
+  const [salesData, setSalesData] = useState<any[]>([]);
+
+  useEffect(() => {
+    setSalesData([
+      { name: "Mon", total: Math.floor(Math.random() * 2000) + 1000 },
+      { name: "Tue", total: Math.floor(Math.random() * 2000) + 1000 },
+      { name: "Wed", total: Math.floor(Math.random() * 2000) + 1000 },
+      { name: "Thu", total: Math.floor(Math.random() * 2000) + 1000 },
+      { name: "Fri", total: Math.floor(Math.random() * 2000) + 1000 },
+      { name: "Sat", total: Math.floor(Math.random() * 2000) + 1000 },
+      { name: "Sun", total: Math.floor(Math.random() * 2000) + 1000 },
+    ]);
+  }, []);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
