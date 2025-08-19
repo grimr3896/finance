@@ -10,6 +10,7 @@ import {
   BrainCircuit,
   ShieldAlert,
   ShoppingCart,
+  MessageSquare,
 } from "lucide-react";
 
 import {
@@ -53,6 +54,11 @@ const links = [
     href: "/anomaly-detection",
     label: "Anomaly Detection",
     icon: ShieldAlert,
+  },
+  {
+    href: "/customer-support",
+    label: "Customer Support",
+    icon: MessageSquare,
   },
 ];
 
