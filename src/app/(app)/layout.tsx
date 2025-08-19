@@ -16,8 +16,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar>
         <SidebarHeader>
           <div className="flex items-center gap-2 p-2">
-            <Logo className="size-6 text-primary" />
-            <h1 className="text-lg font-headline font-semibold">BarBuddy POS</h1>
+            <Logo className="size-8 text-primary" />
+            <h1 className="text-lg font-headline font-semibold">Galaxy Inn</h1>
           </div>
         </SidebarHeader>
         <SidebarContent>
