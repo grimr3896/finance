@@ -176,11 +176,11 @@ export function PosTerminal() {
                 <Button
                   key={drink.id}
                   variant="outline"
-                  className="h-24 flex-col justify-between p-2 text-center"
+                  className="h-24 flex-col justify-between p-2 text-center border-primary/20 hover:bg-primary/10 hover:border-primary"
                   onClick={() => addToCart(drink)}
                 >
-                  <span className="text-sm font-medium">{drink.name}</span>
-                  <span className="text-xs text-muted-foreground">Ksh {drink.sellingPrice.toFixed(2)}</span>
+                  <span className="text-sm font-medium text-foreground">{drink.name}</span>
+                  <span className="text-xs text-primary font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</span>
                 </Button>
               ))}
             </CardContent>
