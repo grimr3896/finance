@@ -55,12 +55,12 @@ import {
 
 
 const initialDrinks: Drink[] = [
-  { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202' },
-  { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 8, unit: 'bottle', barcode: '6161100110103' },
-  { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301' },
-  { id: "DRK004", name: "Draft Beer", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0' },
-  { id: "DRK005", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 72, unit: 'bottle', barcode: '8712000030393' },
-  { id: "DRK006", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202' },
+  { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202', image: "https://placehold.co/150x150.png" },
+  { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 8, unit: 'bottle', barcode: '6161100110103', image: "https://placehold.co/150x150.png" },
+  { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301', image: "https://placehold.co/150x150.png" },
+  { id: "DRK004", name: "Draft Beer", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0', image: "https://placehold.co/150x150.png" },
+  { id: "DRK005", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 72, unit: 'bottle', barcode: '8712000030393', image: "https://placehold.co/150x150.png" },
+  { id: "DRK006", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202', image: "https://placehold.co/150x150.png" },
 ];
 
 const LOW_STOCK_THRESHOLD = 10;
@@ -204,6 +204,10 @@ export function InventoryManager() {
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="barcode" className="text-right">Barcode</Label>
               <Input id="barcode" value={editingDrink?.barcode || ''} onChange={(e) => handleFieldChange('barcode', e.target.value)} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="image" className="text-right">Image URL</Label>
+              <Input id="image" value={editingDrink?.image || ''} onChange={(e) => handleFieldChange('image', e.target.value)} className="col-span-3" />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="unit" className="text-right">Unit</Label>

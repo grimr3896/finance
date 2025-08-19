@@ -32,15 +32,16 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import Image from "next/image";
 
 const availableDrinks: Drink[] = [
-    { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202' },
-    { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 36, unit: 'bottle', barcode: '6161100110103' },
-    { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301' },
-    { id: "DRK004", name: "Draft Beer (250ml)", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0' },
-    { id: "DRK005", name: "Drum (250ml)", costPrice: 180, sellingPrice: 220, stock: 100, unit: 'ml', unitMl: 250, barcode: '1' },
-    { id: "DRK006", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 72, unit: 'bottle', barcode: '8712000030393' },
-    { id: "DRK007", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202' },
+    { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202', image: "https://placehold.co/150x150.png" },
+    { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 36, unit: 'bottle', barcode: '6161100110103', image: "https://placehold.co/150x150.png" },
+    { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301', image: "https://placehold.co/150x150.png" },
+    { id: "DRK004", name: "Draft Beer (250ml)", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0', image: "https://placehold.co/150x150.png" },
+    { id: "DRK005", name: "Drum (250ml)", costPrice: 180, sellingPrice: 220, stock: 100, unit: 'ml', unitMl: 250, barcode: '1', image: "https://placehold.co/150x150.png" },
+    { id: "DRK006", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 72, unit: 'bottle', barcode: '8712000030393', image: "https://placehold.co/150x150.png" },
+    { id: "DRK007", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202', image: "https://placehold.co/150x150.png" },
 ];
 
 type CartItem = {
@@ -173,22 +174,28 @@ export function PosTerminal() {
               </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-1 overflow-y-auto p-2">
               {filteredDrinks.map((drink) => (
-                <Button
+                <Card
                   key={drink.id}
-                  variant="outline"
-                  className="h-24 flex-col justify-between p-2 text-center border-border/50 hover:bg-accent hover:border-primary transition-all duration-200 ease-in-out shadow-sm hover:shadow-lg hover:shadow-primary/20"
+                  className="overflow-hidden cursor-pointer group border-border/50 hover:border-primary transition-all duration-200 ease-in-out shadow-sm hover:shadow-lg hover:shadow-primary/20"
                   onClick={() => addToCart(drink)}
                 >
-                  <span className="text-sm font-medium text-foreground whitespace-normal">{drink.name}</span>
-                  <span className="text-xs text-primary font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</span>
-                </Button>
+                  <div className="aspect-square relative">
+                    {drink.image && (
+                      <Image src={drink.image} alt={drink.name} fill className="object-cover" data-ai-hint="drink bottle" />
+                    )}
+                  </div>
+                  <div className="p-2 text-center bg-card">
+                    <p className="text-sm font-medium text-foreground truncate">{drink.name}</p>
+                    <p className="text-xs text-primary font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
+                  </div>
+                </Card>
               ))}
             </CardContent>
           </Card>
         </div>
 
         <div className="lg:col-span-1">
-          <Card className="flex h-full flex-col">
+          <Card className="flex h-full flex-col bg-card">
             <CardHeader>
               <CardTitle className="font-headline text-primary">Current Order</CardTitle>
             </CardHeader>

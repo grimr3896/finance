@@ -7,6 +7,7 @@ export type Drink = {
   unit: 'bottle' | 'ml';
   unitMl?: number; // e.g., 250 for a 250ml serving from a drum
   barcode?: string;
+  image?: string;
 };
 
 export type Employee = {
