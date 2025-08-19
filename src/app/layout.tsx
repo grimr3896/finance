@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { Toaster } from "@/components/ui/toaster";
 
 export const metadata: Metadata = {
-  title: 'Galaxy Inn',
+  title: 'BarBuddy POS',
   description: 'Desktop Bar Management POS',
 };
 
