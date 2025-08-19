@@ -9,6 +9,7 @@ import {
   BarChart3,
   BrainCircuit,
   ShieldAlert,
+  ShoppingCart,
 } from "lucide-react";
 
 import {
@@ -22,6 +23,11 @@ const links = [
     href: "/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
+  },
+  {
+    href: "/pos",
+    label: "Point of Sale",
+    icon: ShoppingCart,
   },
   {
     href: "/inventory",
@@ -59,7 +65,7 @@ export function MainNav() {
         <SidebarMenuItem key={link.href}>
           <SidebarMenuButton
             asChild
-            isActive={pathname === link.href}
+            isActive={pathname.startsWith(link.href)}
             tooltip={link.label}
           >
             <Link href={link.href}>
