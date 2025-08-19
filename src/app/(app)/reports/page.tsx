@@ -57,7 +57,7 @@ export default function ReportsPage() {
                 <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$4,250.50</div>
+                <div className="text-2xl font-bold">Ksh 42,250.50</div>
               </CardContent>
             </Card>
              <Card>
@@ -65,7 +65,7 @@ export default function ReportsPage() {
                 <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$1,200.00</div>
+                <div className="text-2xl font-bold">Ksh 12,000.00</div>
               </CardContent>
             </Card>
              <Card>
@@ -73,7 +73,7 @@ export default function ReportsPage() {
                 <CardTitle className="text-sm font-medium">Profit</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-green-500">$3,050.50</div>
+                <div className="text-2xl font-bold text-emerald-500">Ksh 30,250.50</div>
               </CardContent>
             </Card>
              <Card>
@@ -103,7 +103,7 @@ export default function ReportsPage() {
                             <TableRow key={expense.id}>
                                 <TableCell>{expense.date}</TableCell>
                                 <TableCell>{expense.description}</TableCell>
-                                <TableCell className="text-right">${expense.amount.toFixed(2)}</TableCell>
+                                <TableCell className="text-right">Ksh {expense.amount.toFixed(2)}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

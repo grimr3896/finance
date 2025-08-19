@@ -33,16 +33,19 @@ export default function DashboardPage() {
   const [salesData, setSalesData] = useState<any[]>([]);
 
   useEffect(() => {
-    setSalesData([
-      { name: "Mon", total: Math.floor(Math.random() * 2000) + 1000 },
-      { name: "Tue", total: Math.floor(Math.random() * 2000) + 1000 },
-      { name: "Wed", total: Math.floor(Math.random() * 2000) + 1000 },
-      { name: "Thu", total: Math.floor(Math.random() * 2000) + 1000 },
-      { name: "Fri", total: Math.floor(Math.random() * 2000) + 1000 },
-      { name: "Sat", total: Math.floor(Math.random() * 2000) + 1000 },
-      { name: "Sun", total: Math.floor(Math.random() * 2000) + 1000 },
-    ]);
+    // Generate random sales data for the chart
+    const generateSalesData = () => [
+      { name: "Mon", total: Math.floor(Math.random() * 20000) + 10000 },
+      { name: "Tue", total: Math.floor(Math.random() * 20000) + 10000 },
+      { name: "Wed", total: Math.floor(Math.random() * 20000) + 10000 },
+      { name: "Thu", total: Math.floor(Math.random() * 20000) + 10000 },
+      { name: "Fri", total: Math.floor(Math.random() * 20000) + 10000 },
+      { name: "Sat", total: Math.floor(Math.random() * 20000) + 10000 },
+      { name: "Sun", total: Math.floor(Math.random() * 20000) + 10000 },
+    ];
+    setSalesData(generateSalesData());
   }, []);
+
 
   return (
     <div className="flex flex-col gap-6">
@@ -53,7 +56,7 @@ export default function DashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
+            <div className="text-2xl font-bold">Ksh 452,231.89</div>
             <p className="text-xs text-muted-foreground">+20.1% from last month</p>
           </CardContent>
         </Card>
@@ -110,7 +113,7 @@ export default function DashboardPage() {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  tickFormatter={(value) => `$${value}`}
+                  tickFormatter={(value) => `Ksh ${value/1000}k`}
                 />
                 <Tooltip
                   cursor={{ fill: 'hsl(var(--muted))' }}
@@ -118,6 +121,7 @@ export default function DashboardPage() {
                     backgroundColor: 'hsl(var(--background))',
                     borderColor: 'hsl(var(--border))'
                   }}
+                   formatter={(value: number) => [`Ksh ${value.toLocaleString()}`, "Sales"]}
                 />
                 <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -151,7 +155,7 @@ export default function DashboardPage() {
                         {sale.paymentMethod}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right">${sale.total.toFixed(2)}</TableCell>
+                    <TableCell className="text-right">Ksh {sale.total.toFixed(2)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

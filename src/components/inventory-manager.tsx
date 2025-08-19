@@ -241,11 +241,11 @@ export function InventoryManager() {
               <Input id="stock" type="number" value={editingDrink?.stock || ''} onChange={(e) => handleFieldChange('stock', +e.target.value)} className="col-span-3" />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="costPrice" className="text-right">Cost Price</Label>
+              <Label htmlFor="costPrice" className="text-right">Cost Price (Ksh)</Label>
               <Input id="costPrice" type="number" value={editingDrink?.costPrice || ''} onChange={(e) => handleFieldChange('costPrice', +e.target.value)} className="col-span-3" />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="sellingPrice" className="text-right">Selling Price</Label>
+              <Label htmlFor="sellingPrice" className="text-right">Selling Price (Ksh)</Label>
               <Input id="sellingPrice" type="number" value={editingDrink?.sellingPrice || ''} onChange={(e) => handleFieldChange('sellingPrice', +e.target.value)} className="col-span-3" />
             </div>
              {editingDrink?.unit === 'ml' && (
