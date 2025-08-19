@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,19 +18,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, MinusCircle, XCircle, Search } from "lucide-react";
+import { PlusCircle, MinusCircle, Search, ScanBarcode } from "lucide-react";
 import type { Drink } from "@/lib/types";
 
 const availableDrinks: Drink[] = [
-    { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle' },
-    { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 36, unit: 'bottle' },
-    { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle' },
-    { id: "DRK004", name: "Draft Beer (250ml)", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250 },
-    { id: "DRK005", name: "Drum (250ml)", costPrice: 180, sellingPrice: 220, stock: 100, unit: 'ml', unitMl: 250 },
-    { id: "DRK006", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 72, unit: 'bottle' },
-    { id: "DRK007", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle' },
+    { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202' },
+    { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 36, unit: 'bottle', barcode: '6161100110103' },
+    { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301' },
+    { id: "DRK004", name: "Draft Beer (250ml)", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0' },
+    { id: "DRK005", name: "Drum (250ml)", costPrice: 180, sellingPrice: 220, stock: 100, unit: 'ml', unitMl: 250, barcode: '1' },
+    { id: "DRK006", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 72, unit: 'bottle', barcode: '8712000030393' },
+    { id: "DRK007", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202' },
 ];
 
 type CartItem = {
@@ -40,6 +40,18 @@ type CartItem = {
 export function PosTerminal() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const router = useRouter();
+
+  useEffect(() => {
+    const scannedDrinkId = localStorage.getItem("scannedDrinkId");
+    if (scannedDrinkId) {
+      const drinkToAdd = availableDrinks.find(d => d.id === scannedDrinkId);
+      if (drinkToAdd) {
+        addToCart(drinkToAdd);
+      }
+      localStorage.removeItem("scannedDrinkId");
+    }
+  }, []);
 
   const addToCart = (drink: Drink) => {
     setCart((prevCart) => {
@@ -81,14 +93,17 @@ export function PosTerminal() {
         <Card className="h-full">
             <CardHeader>
                 <CardTitle className="font-headline">Available Drinks</CardTitle>
-                <div className="relative mt-2">
+                <div className="relative mt-2 flex gap-2">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <Input 
-                        placeholder="Search drinks..." 
+                        placeholder="Search or scan barcode..." 
                         className="pl-8" 
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
+                    <Button variant="outline" size="icon" onClick={() => router.push('/pos/scan')}>
+                        <ScanBarcode />
+                    </Button>
                 </div>
             </CardHeader>
           <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
