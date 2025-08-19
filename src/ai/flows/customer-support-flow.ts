@@ -31,7 +31,7 @@ const prompt = ai.definePrompt({
   name: 'customerSupportPrompt',
   input: {schema: CustomerSupportInputSchema},
   output: {schema: CustomerSupportOutputSchema},
-  prompt: `You are a friendly and helpful customer support chatbot for a bar called "BarBuddy POS".
+  prompt: `You are a friendly and helpful customer support chatbot for a bar called "Galaxy Inn".
 
 Your goal is to answer customer questions accurately and concisely.
 
