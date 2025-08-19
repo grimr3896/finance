@@ -155,14 +155,14 @@ export function PosTerminal() {
     <>
       <div className="grid h-[calc(100vh-4rem)] grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <Card className="h-full flex flex-col">
+          <Card className="h-full flex flex-col bg-transparent border-0 shadow-none">
               <CardHeader>
-                  <CardTitle className="font-headline">Available Drinks</CardTitle>
+                  <CardTitle className="font-headline text-primary">Available Drinks</CardTitle>
                   <div className="relative mt-2 flex gap-2">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input 
                           placeholder="Search for a drink..." 
-                          className="pl-8" 
+                          className="pl-8 bg-card border-border" 
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                       />
@@ -171,15 +171,15 @@ export function PosTerminal() {
                       </Button>
                   </div>
               </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-1 overflow-y-auto">
+            <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-1 overflow-y-auto p-2">
               {filteredDrinks.map((drink) => (
                 <Button
                   key={drink.id}
                   variant="outline"
-                  className="h-24 flex-col justify-between p-2 text-center border-primary/20 hover:bg-primary/10 hover:border-primary"
+                  className="h-24 flex-col justify-between p-2 text-center border-border/50 hover:bg-accent hover:border-primary transition-all duration-200 ease-in-out shadow-sm hover:shadow-lg hover:shadow-primary/20"
                   onClick={() => addToCart(drink)}
                 >
-                  <span className="text-sm font-medium text-foreground">{drink.name}</span>
+                  <span className="text-sm font-medium text-foreground whitespace-normal">{drink.name}</span>
                   <span className="text-xs text-primary font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</span>
                 </Button>
               ))}
@@ -190,7 +190,7 @@ export function PosTerminal() {
         <div className="lg:col-span-1">
           <Card className="flex h-full flex-col">
             <CardHeader>
-              <CardTitle className="font-headline">Current Order</CardTitle>
+              <CardTitle className="font-headline text-primary">Current Order</CardTitle>
             </CardHeader>
             <CardContent className="flex-1 overflow-y-auto">
               {cart.length === 0 ? (
@@ -230,14 +230,14 @@ export function PosTerminal() {
                   </Table>
               )}
             </CardContent>
-            <CardFooter className="flex-col !p-4">
+            <CardFooter className="flex-col !p-4 border-t">
               <div className="flex w-full justify-between text-2xl font-bold">
                   <span>Total</span>
-                  <span>Ksh {total.toFixed(2)}</span>
+                  <span className="text-primary">Ksh {total.toFixed(2)}</span>
               </div>
               <div className="mt-4 grid w-full grid-cols-2 gap-2">
                   <Button size="lg" variant="secondary" onClick={() => openCashoutModal('Cash')}>Cash</Button>
-                  <Button size="lg" className="bg-green-600 hover:bg-green-700" onClick={() => openCashoutModal('M-Pesa')}>M-Pesa</Button>
+                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openCashoutModal('M-Pesa')}>M-Pesa</Button>
               </div>
             </CardFooter>
           </Card>
@@ -247,7 +247,7 @@ export function PosTerminal() {
       <Dialog open={isCashoutOpen} onOpenChange={setIsCashoutOpen}>
         <DialogContent className="sm:max-w-md">
             <DialogHeader>
-                <DialogTitle className="font-headline">{paymentMethod} Payment</DialogTitle>
+                <DialogTitle className="font-headline text-primary">{paymentMethod} Payment</DialogTitle>
                 <DialogDescription>
                     Total amount due: <strong>Ksh {total.toFixed(2)}</strong>
                 </DialogDescription>
