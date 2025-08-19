@@ -63,6 +63,7 @@ export function EmployeeManager() {
   };
 
   const handleSave = () => {
+    // In a real app, you would handle form submission logic here
     setIsDialogOpen(false);
     setEditingEmployee(null);
   };
@@ -102,7 +103,7 @@ export function EmployeeManager() {
                   <TableCell className="font-medium">{employee.name}</TableCell>
                   <TableCell>{employee.role}</TableCell>
                   <TableCell>
-                    <Badge variant={employee.status === 'Clocked In' ? 'default' : 'secondary'} className={employee.status === 'Clocked In' ? 'bg-green-600' : ''}>
+                    <Badge variant={employee.status === 'Clocked In' ? 'default' : 'secondary'} className={employee.status === 'Clocked In' ? 'bg-emerald-600 text-emerald-50 hover:bg-emerald-600/80' : ''}>
                       {employee.status}
                     </Badge>
                   </TableCell>
