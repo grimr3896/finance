@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, MinusCircle, Search, ScanBarcode, Loader2, CheckCircle } from "lucide-react";
+import { PlusCircle, MinusCircle, Search, ScanBarcode, Loader2, CheckCircle, XCircle } from "lucide-react";
 import type { Drink, Sale } from "@/lib/types";
 import {
   Dialog,
@@ -376,7 +376,7 @@ export function PosTerminal() {
                     )}
                      {mpesaStep === 'failed' && (
                          <div className="flex flex-col items-center justify-center space-y-2 text-destructive">
-                            <CheckCircle className="h-8 w-8" />
+                            <XCircle className="h-8 w-8" />
                             <p className="font-semibold">Payment Failed</p>
                             <p>Please try again or use another payment method.</p>
                         </div>
@@ -397,9 +397,13 @@ export function PosTerminal() {
                      <Button 
                         type="button" 
                         onClick={handleMpesaPayment}
-                        disabled={mpesaStep !== 'enterPhone' || customerPhone.length < 10}
+                        disabled={(mpesaStep === 'pending' || mpesaStep === 'success') || (mpesaStep === 'enterPhone' && customerPhone.length < 10)}
                     >
-                        {mpesaStep === 'enterPhone' ? "Request Payment" : <Loader2 className="h-4 w-4 animate-spin" />}
+                        {mpesaStep === 'pending' ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : mpesaStep === 'failed' ? (
+                            "Retry"
+                        ) : "Request Payment"}
                     </Button>
                 )}
             </DialogFooter>
