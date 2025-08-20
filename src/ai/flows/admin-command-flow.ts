@@ -10,28 +10,14 @@
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 import {
+  AdminCommandInputSchema,
+  AdminCommandOutputSchema,
   DateInputSchema,
-  DateRangeInputSchema,
-  MonthYearInputSchema,
   PeriodInputSchema,
+  type AdminCommandInput,
+  type AdminCommandOutput,
 } from '@/ai/schemas/admin-command-schemas';
 import { format } from 'date-fns';
-
-// Schemas for the main flow
-export const AdminCommandInputSchema = z.object({
-  from: z.string().email().describe("The admin's personal email address."),
-  subject: z.string().describe('The subject of the email.'),
-  body: z.string().describe('The body content of the email.'),
-});
-export type AdminCommandInput = z.infer<typeof AdminCommandInputSchema>;
-
-export const AdminCommandOutputSchema = z.object({
-  shouldReply: z.boolean().describe('Whether a reply should be sent.'),
-  replyBody: z
-    .string()
-    .describe('The generated email body for the reply.'),
-});
-export type AdminCommandOutput = z.infer<typeof AdminCommandOutputSchema>;
 
 
 // #region MOCK DATA AND TOOLS
@@ -192,7 +178,7 @@ Set 'shouldReply' to false if the original sender was not the admin ('admin@barb
 });
 
 
-export const processAdminCommandFlow = ai.defineFlow(
+const processAdminCommandFlow = ai.defineFlow(
   {
     name: 'processAdminCommandFlow',
     inputSchema: AdminCommandInputSchema,

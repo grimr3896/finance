@@ -3,12 +3,9 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {
-  AdminCommandInput,
-  AdminCommandOutput,
-  processAdminCommand,
-  AdminCommandInputSchema,
-} from "@/ai/flows/admin-command-flow";
+import { processAdminCommand } from "@/ai/flows/admin-command-flow";
+import type { AdminCommandInput, AdminCommandOutput } from "@/ai/schemas/admin-command-schemas";
+import { AdminCommandInputSchema } from "@/ai/schemas/admin-command-schemas";
 import { useAuth, ROLE } from "@/lib/auth";
 
 import { Button } from "@/components/ui/button";
