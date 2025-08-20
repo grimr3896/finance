@@ -20,7 +20,6 @@ export function Receipt({ sale, cashReceived, changeDue }: ReceiptProps) {
     <div className="bg-background text-foreground font-mono text-sm p-4">
       <div className="text-center mb-4">
         <h2 className="text-lg font-bold font-headline">Galaxy Inn</h2>
-        <p>123 Space Bar Lane, Nairobi</p>
         <p>Tel: 0712 345 678</p>
       </div>
       
