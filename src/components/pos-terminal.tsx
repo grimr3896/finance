@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, MinusCircle, Search, ScanBarcode, Loader2 } from "lucide-react";
+import { PlusCircle, MinusCircle, Search, ScanBarcode } from "lucide-react";
 import type { Drink, Sale } from "@/lib/types";
 import {
   Dialog,
@@ -32,8 +32,9 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import Image from "next/image";
 import { Receipt } from "@/components/receipt";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const availableDrinks: Drink[] = [
     { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202', image: "https://placehold.co/150x150.png" },
@@ -62,6 +63,7 @@ export function PosTerminal() {
   const [isCashoutOpen, setIsCashoutOpen] = useState(false);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [lastSale, setLastSale] = useState<CompletedSale | null>(null);
+  const [salesHistory, setSalesHistory] = useState<CompletedSale[]>([]);
   const [paymentMethod, setPaymentMethod] = useState<"Cash" | "Card" | "Mpesa" | null>(null);
   const [cashReceived, setCashReceived] = useState("");
   const [mpesaPhone, setMpesaPhone] = useState("");
@@ -151,11 +153,14 @@ export function PosTerminal() {
         mpesaPhone: paymentMethod === 'Mpesa' ? mpesaPhone : undefined,
     };
     
-    setLastSale({
+    const completedSale: CompletedSale = {
       sale,
       cashReceived: paymentMethod === 'Cash' ? parseFloat(cashReceived) : total,
       changeDue,
-    });
+    };
+
+    setLastSale(completedSale);
+    setSalesHistory(prev => [completedSale, ...prev]);
     
     setCart([]);
     resetCashout();
@@ -214,58 +219,84 @@ export function PosTerminal() {
 
         <div className="lg:col-span-1">
           <Card className="flex h-full flex-col bg-card">
-            <CardHeader>
-              <CardTitle className="font-headline text-primary">Current Order</CardTitle>
-            </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto p-2">
-              {cart.length === 0 ? (
-                  <div className="flex h-full items-center justify-center">
-                      <p className="text-muted-foreground">Cart is empty</p>
-                  </div>
-              ) : (
-                  <Table>
-                      <TableHeader>
-                          <TableRow>
-                              <TableHead>Item</TableHead>
-                              <TableHead className="w-[120px]">Qty</TableHead>
-                              <TableHead className="text-right">Price</TableHead>
-                          </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                      {cart.map((item) => (
-                          <TableRow key={item.drink.id}>
-                          <TableCell className="font-medium">{item.drink.name}</TableCell>
-                          <TableCell>
-                              <div className="flex items-center gap-1">
-                                  <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity - 1)}>
-                                      <MinusCircle className="h-4 w-4" />
-                                  </Button>
-                                  <span className="w-6 text-center">{item.quantity}</span>
-                                  <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity + 1)}>
-                                      <PlusCircle className="h-4 w-4" />
-                                  </Button>
+            <Tabs defaultValue="order" className="flex flex-col h-full">
+              <CardHeader className="p-4">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="order">Current Order</TabsTrigger>
+                  <TabsTrigger value="history">Order History</TabsTrigger>
+                </TabsList>
+              </CardHeader>
+              <TabsContent value="order" className="flex-1 overflow-y-auto p-2 m-0">
+                  {cart.length === 0 ? (
+                      <div className="flex h-full items-center justify-center">
+                          <p className="text-muted-foreground">Cart is empty</p>
+                      </div>
+                  ) : (
+                      <Table>
+                          <TableHeader>
+                              <TableRow>
+                                  <TableHead>Item</TableHead>
+                                  <TableHead className="w-[120px]">Qty</TableHead>
+                                  <TableHead className="text-right">Price</TableHead>
+                              </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                          {cart.map((item) => (
+                              <TableRow key={item.drink.id}>
+                              <TableCell className="font-medium">{item.drink.name}</TableCell>
+                              <TableCell>
+                                  <div className="flex items-center gap-1">
+                                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity - 1)}>
+                                          <MinusCircle className="h-4 w-4" />
+                                      </Button>
+                                      <span className="w-6 text-center">{item.quantity}</span>
+                                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity + 1)}>
+                                          <PlusCircle className="h-4 w-4" />
+                                      </Button>
+                                  </div>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                  Ksh {(item.drink.sellingPrice * item.quantity).toFixed(2)}
+                              </TableCell>
+                              </TableRow>
+                          ))}
+                          </TableBody>
+                      </Table>
+                  )}
+              </TabsContent>
+               <TabsContent value="history" className="flex-1 overflow-y-auto m-0">
+                 <ScrollArea className="h-full px-4">
+                    {salesHistory.length === 0 ? (
+                      <div className="flex h-full items-center justify-center">
+                          <p className="text-muted-foreground">No sales yet</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {salesHistory.map(({ sale }) => (
+                           <div key={sale.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-muted/50">
+                              <div>
+                                  <p className="font-mono text-xs">{sale.id}</p>
+                                  <p className="text-muted-foreground text-xs">{new Date(sale.timestamp).toLocaleTimeString()}</p>
                               </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                              Ksh {(item.drink.sellingPrice * item.quantity).toFixed(2)}
-                          </TableCell>
-                          </TableRow>
-                      ))}
-                      </TableBody>
-                  </Table>
-              )}
-            </CardContent>
-            <CardFooter className="flex-col !p-4 border-t">
-              <div className="flex w-full justify-between text-2xl font-bold">
-                  <span>Total</span>
-                  <span className="text-primary">Ksh {total.toFixed(2)}</span>
-              </div>
-              <div className="mt-4 grid w-full grid-cols-3 gap-2">
-                  <Button size="lg" variant="secondary" onClick={() => openCashoutModal('Cash')} disabled={cart.length === 0}>Cash</Button>
-                  <Button size="lg" variant="outline" onClick={() => openCashoutModal('Card')} disabled={cart.length === 0}>Card</Button>
-                  <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => openCashoutModal('Mpesa')} disabled={cart.length === 0}>M-Pesa</Button>
-              </div>
-            </CardFooter>
+                              <p className="font-semibold text-primary">Ksh {sale.total.toFixed(2)}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                 </ScrollArea>
+              </TabsContent>
+              <CardFooter className="flex-col !p-4 border-t">
+                <div className="flex w-full justify-between text-2xl font-bold">
+                    <span>Total</span>
+                    <span className="text-primary">Ksh {total.toFixed(2)}</span>
+                </div>
+                <div className="mt-4 grid w-full grid-cols-3 gap-2">
+                    <Button size="lg" variant="secondary" onClick={() => openCashoutModal('Cash')} disabled={cart.length === 0}>Cash</Button>
+                    <Button size="lg" variant="outline" onClick={() => openCashoutModal('Card')} disabled={cart.length === 0}>Card</Button>
+                    <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => openCashoutModal('Mpesa')} disabled={cart.length === 0}>M-Pesa</Button>
+                </div>
+              </CardFooter>
+            </Tabs>
           </Card>
         </div>
       </div>
