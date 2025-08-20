@@ -80,13 +80,15 @@ export function PosTerminal() {
   }, []);
 
   useEffect(() => {
-    const scannedDrinkId = localStorage.getItem("scannedDrinkId");
-    if (scannedDrinkId) {
-      const drinkToAdd = availableDrinks.find(d => d.id === scannedDrinkId);
-      if (drinkToAdd) {
-        addToCart(drinkToAdd);
-      }
-      localStorage.removeItem("scannedDrinkId");
+    if (typeof window !== 'undefined') {
+        const scannedDrinkId = localStorage.getItem("scannedDrinkId");
+        if (scannedDrinkId) {
+            const drinkToAdd = availableDrinks.find(d => d.id === scannedDrinkId);
+            if (drinkToAdd) {
+                addToCart(drinkToAdd);
+            }
+            localStorage.removeItem("scannedDrinkId");
+        }
     }
   }, []);
 
@@ -185,7 +187,9 @@ export function PosTerminal() {
   };
 
   const handlePrint = () => {
-    window.print();
+    if (typeof window !== 'undefined') {
+      window.print();
+    }
   }
 
   const changeDue = useMemo(() => {
@@ -223,7 +227,7 @@ export function PosTerminal() {
               {filteredDrinks.map((drink) => (
                 <Card
                   key={drink.id}
-                  className="flex flex-col p-2 bg-[#9d2953] transition-opacity"
+                  className="flex flex-col p-2 bg-[#800020] transition-opacity"
                 >
                   <div className="flex-1 text-center">
                     <p className="text-sm font-medium text-white">{drink.name}</p>

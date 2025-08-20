@@ -20,18 +20,23 @@ function debounce<F extends (...args: any[]) => any>(func: F, waitFor: number) {
 
 
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === 'undefined') {
-      return initialValue;
-    }
+  const [storedValue, setStoredValue] = useState<T>(initialValue);
+
+  useEffect(() => {
+    // This effect runs only on the client
     try {
       const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
+      if (item) {
+        setStoredValue(JSON.parse(item));
+      } else {
+        setStoredValue(initialValue);
+      }
     } catch (error) {
       console.error(error);
-      return initialValue;
+      setStoredValue(initialValue);
     }
-  });
+  }, [key, initialValue]);
+
 
   const debouncedSetValue = useCallback(
     debounce((value: T) => {
@@ -44,25 +49,18 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
         console.error(error);
       }
     }, 500),
-    [key]
+    [key, storedValue]
   );
   
   const setValue = (value: T | ((val: T) => T)) => {
-    const valueToStore = value instanceof Function ? value(storedValue) : value;
-    setStoredValue(valueToStore);
-    debouncedSetValue(valueToStore);
-  };
-
-  useEffect(() => {
     try {
-        const item = window.localStorage.getItem(key);
-        if (item) {
-            setStoredValue(JSON.parse(item));
-        }
+        const valueToStore = value instanceof Function ? value(storedValue) : value;
+        setStoredValue(valueToStore);
+        debouncedSetValue(valueToStore);
     } catch (error) {
-        console.log(error);
+        console.error(error)
     }
-  }, [key]);
+  };
 
   return [storedValue, setValue];
 }

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -27,7 +28,7 @@ export function BarcodeScanner() {
 
   useEffect(() => {
     const getCameraPermission = async () => {
-      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      if (typeof window === 'undefined' || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         console.error("Camera API is not supported in this browser.");
         setHasCameraPermission(false);
         toast({
@@ -75,7 +76,9 @@ export function BarcodeScanner() {
     const drinkId = barcodeToDrinkId[randomBarcode];
 
     // Store the scanned drink ID in local storage to be picked up by the POS page
-    localStorage.setItem("scannedDrinkId", drinkId);
+    if (typeof window !== 'undefined') {
+        localStorage.setItem("scannedDrinkId", drinkId);
+    }
 
     toast({
       title: "Item Scanned",

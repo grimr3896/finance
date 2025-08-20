@@ -19,9 +19,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState({ primary: "45 96% 51%", accent: "347 77% 49%" });
 
   useEffect(() => {
-    const root = document.documentElement;
-    root.style.setProperty("--primary", theme.primary);
-    root.style.setProperty("--accent", theme.accent);
+    if (typeof window !== 'undefined') {
+        const root = document.documentElement;
+        root.style.setProperty("--primary", theme.primary);
+        root.style.setProperty("--accent", theme.accent);
+    }
   }, [theme]);
 
   const handleThemeChange = (newTheme: { primary: string; accent: string }) => {
