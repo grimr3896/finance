@@ -53,7 +53,12 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <UserNav />
           </header>
           <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-            {React.cloneElement(children as React.ReactElement, { handleThemeChange })}
+            {React.Children.map(children, child => {
+                if (React.isValidElement(child)) {
+                    return React.cloneElement(child, { handleThemeChange } as any);
+                }
+                return child;
+            })}
           </main>
         </SidebarInset>
       </SidebarProvider>
