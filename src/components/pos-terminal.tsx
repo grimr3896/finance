@@ -215,13 +215,12 @@ export function PosTerminal() {
               {filteredDrinks.map((drink) => (
                 <Card
                   key={drink.id}
-                  className="cursor-pointer group border-border/50 hover:border-primary transition-all duration-200 ease-in-out shadow-sm hover:shadow-lg hover:shadow-primary/20 bg-card flex items-center justify-center p-2"
+                  className="cursor-pointer flex items-center justify-center p-2 bg-[#9d2953] hover:opacity-90 transition-opacity"
                   onClick={() => addToCart(drink)}
                 >
                   <div className="text-center">
-                    <p className="text-sm font-medium text-foreground">{drink.name}</p>
-                    <p className="text-xs text-primary font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
-                     <p className="text-xs text-emerald-500">Profit: Ksh {(drink.sellingPrice - drink.costPrice).toFixed(2)}</p>
+                    <p className="text-sm font-medium text-white">{drink.name}</p>
+                    <p className="text-xs text-black font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
                   </div>
                 </Card>
               ))}
