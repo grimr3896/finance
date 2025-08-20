@@ -1,5 +1,4 @@
 
-import { ThemeCustomizer } from "@/components/theme-customizer";
 import type { Metadata } from 'next';
 import { CompanyInfoForm } from "@/components/company-info-form";
 
@@ -8,7 +7,7 @@ export const metadata: Metadata = {
     description: "Customize application settings.",
 };
 
-export default function SettingsPage({ handleThemeChange }: { handleThemeChange: (theme: { primary: string; accent: string }) => void }) {
+export default function SettingsPage() {
   return (
     <div className="space-y-6">
         <div>
@@ -18,7 +17,6 @@ export default function SettingsPage({ handleThemeChange }: { handleThemeChange:
             </p>
         </div>
         <CompanyInfoForm />
-        <ThemeCustomizer handleThemeChange={handleThemeChange} />
     </div>
   );
 }
