@@ -20,25 +20,44 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { BrainCircuit, Loader2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { BrainCircuit, Loader2, BarChart } from "lucide-react";
 
 const formSchema = z.object({
   historicalSalesData: z.string().min(10, {
     message: "Please provide more detailed historical sales data.",
   }),
-  timeframe: z.string().min(3, {
-    message: "Please specify a timeframe (e.g., 'next month').",
-  }),
-  currentStockLevels: z.string().min(5, {
-    message: "Please provide current stock levels.",
-  }),
+  horizonDays: z.coerce.number().int().positive().default(14),
 });
+
+// Helper to parse CSV data from textarea
+const parseSalesData = (csv: string) => {
+  try {
+    const lines = csv.trim().split("\n");
+    const header = lines.shift()?.toLowerCase().split(",");
+    if (!header || !header.includes("date") || !header.includes("total")) {
+        return [];
+    }
+    const dateIndex = header.indexOf("date");
+    const totalIndex = header.indexOf("total");
+    
+    return lines.map(line => {
+        const values = line.split(",");
+        return {
+            date: values[dateIndex].trim(),
+            total: parseInt(values[totalIndex].trim(), 10)
+        }
+    }).filter(record => record.date && !isNaN(record.total));
+  } catch (e) {
+    console.error("Failed to parse sales data", e);
+    return [];
+  }
+}
 
 export function ForecastingForm() {
   const [loading, setLoading] = useState(false);
@@ -48,9 +67,13 @@ export function ForecastingForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      historicalSalesData: "Product,Date,UnitsSold\nTusker,2024-08-01,50\nTusker,2024-08-02,75\nGuinness,2024-08-01,30\nGuinness,2024-08-02,45",
-      timeframe: "next week",
-      currentStockLevels: "Tusker: 48 bottles\nGuinness: 36 bottles\nDraft Beer Drum: 35000 ml",
+      historicalSalesData: "date,total\n" + Array.from({ length: 20 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() - i -1);
+        const total = Math.floor(Math.random() * 50000) + 20000;
+        return `${d.toISOString().slice(0, 10)},${total}`;
+      }).join("\n"),
+      horizonDays: 14,
     },
   });
 
@@ -59,11 +82,22 @@ export function ForecastingForm() {
     setError(null);
     setResult(null);
 
+    const sales = parseSalesData(values.historicalSalesData);
+
     try {
-      const forecastResult = await predictiveSalesForecasting(values);
-      setResult(forecastResult);
+      const forecastResult = await predictiveSalesForecasting({
+        sales,
+        horizonDays: values.horizonDays,
+      });
+
+      if (forecastResult.ok) {
+        setResult(forecastResult);
+      } else {
+        setError(forecastResult.message || "An unknown error occurred.");
+      }
+
     } catch (e) {
-      setError("An error occurred while generating the forecast. Please try again.");
+      setError("An unexpected network or server error occurred. Please try again.");
       console.error(e);
     } finally {
       setLoading(false);
@@ -85,11 +119,11 @@ export function ForecastingForm() {
                 name="historicalSalesData"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Historical Sales Data (CSV format)</FormLabel>
+                    <FormLabel>Historical Sales Data (date,total)</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="e.g., Product,Date,UnitsSold..."
-                        className="h-32"
+                        placeholder="e.g., 2024-08-01,50000..."
+                        className="h-48 font-mono text-xs"
                         {...field}
                       />
                     </FormControl>
@@ -99,29 +133,12 @@ export function ForecastingForm() {
               />
               <FormField
                 control={form.control}
-                name="currentStockLevels"
+                name="horizonDays"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Current Stock Levels</FormLabel>
+                    <FormLabel>Forecast Horizon (Days)</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="e.g., Tusker: 48 bottles"
-                        className="h-24"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="timeframe"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Forecast Timeframe</FormLabel>
-                    <FormControl>
-                      <Input placeholder="e.g., next week, next month" {...field} />
+                      <Input type="number" placeholder="e.g., 14" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -150,31 +167,45 @@ export function ForecastingForm() {
                 <p className="ml-4 text-muted-foreground">Generating forecast...</p>
             </div>
         )}
-        {error && <Card className="border-destructive"><CardContent className="p-4"><p className="text-destructive">{error}</p></CardContent></Card>}
+        {error && (
+            <Alert variant="destructive">
+              <AlertTitle>Forecast Failed</AlertTitle>
+              <AlertDescription>
+                <p>{error}</p>
+                 <ul className="mt-2 list-disc pl-5 text-xs">
+                    <li>Ensure dates are in YYYY-MM-DD format.</li>
+                    <li>Provide at least 14 days of sales for best results.</li>
+                    <li>Totals must be whole numbers (e.g., 50000).</li>
+                  </ul>
+              </AlertDescription>
+            </Alert>
+        )}
         {result && (
-          <div className="space-y-4">
-            <Card>
-              <CardHeader>
+          <Card>
+            <CardHeader>
                 <CardTitle>Sales Forecast</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-wrap">{result.salesForecast}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader>
-                <CardTitle>Stock Recommendations</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="whitespace-pre-wrap">{result.stockRecommendations}</p>
-              </CardContent>
-            </Card>
-          </div>
+                <CardDescription>
+                    Method: <span className="font-semibold text-primary">{result.method}</span> 
+                    {result.usedFallback && <span className="text-muted-foreground"> (fallback)</span>}
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+               {result.message && <p className="text-sm text-muted-foreground mb-4">{result.message}</p>}
+                <div className="space-y-2">
+                {result.forecast?.map(f => (
+                    <div key={f.date} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-muted/50">
+                        <span className="font-mono">{f.date}</span>
+                        <span className="font-semibold text-primary">Ksh {f.total.toLocaleString()}</span>
+                    </div>
+                ))}
+                </div>
+            </CardContent>
+          </Card>
         )}
         {!loading && !result && !error && (
             <div className="flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
-                <BrainCircuit className="h-12 w-12 text-muted-foreground" />
-                <p className="mt-4 text-muted-foreground">Your AI-powered forecast will appear here.</p>
+                <BarChart className="h-12 w-12 text-muted-foreground" />
+                <p className="mt-4 text-muted-foreground">Your sales forecast will appear here.</p>
             </div>
         )}
       </div>
