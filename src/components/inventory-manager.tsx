@@ -260,7 +260,14 @@ export function InventoryManager() {
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="sellingPrice" className="text-right">Selling Price (Ksh)</Label>
-              <Input id="sellingPrice" type="number" value={editingDrink?.sellingPrice || ''} onChange={(e) => handleFieldChange('sellingPrice', +e.target.value)} className="col-span-3" />
+              <Input 
+                id="sellingPrice" 
+                type="number" 
+                value={editingDrink?.sellingPrice || ''} 
+                onChange={(e) => handleFieldChange('sellingPrice', +e.target.value)} 
+                className="col-span-3"
+                disabled={user.role === ROLE.CASHIER}
+              />
             </div>
              {editingDrink?.unit === 'ml' && (
                <div className="grid grid-cols-4 items-center gap-4">
@@ -280,5 +287,3 @@ export function InventoryManager() {
     </>
   );
 }
-
-    
