@@ -1,0 +1,101 @@
+Sale ID,Item,Quantity,Price,Total,Payment Method,Cashier,Timestamp
+1,Laptop,1,1200,1200,Credit Card,Alice,2023-10-27 10:00:00
+2,Mouse,2,25,50,Cash,Bob,2023-10-27 10:05:15
+3,Keyboard,1,75,75,Debit Card,Alice,2023-10-27 10:10:30
+4,Monitor,1,300,300,Credit Card,Charlie,2023-10-27 10:15:45
+5,Webcam,1,50,50,Cash,Alice,2023-10-27 10:20:00
+6,Printer,1,150,150,Debit Card,Bob,2023-10-27 10:25:15
+7,Headphones,3,40,120,Credit Card,Charlie,2023-10-27 10:30:30
+8,Speakers,1,80,80,Cash,Alice,2023-10-27 10:35:45
+9,Router,1,100,100,Debit Card,Bob,2023-10-27 10:40:00
+10,External Hard Drive,1,90,90,Credit Card,Charlie,2023-10-27 10:45:15
+11,USB Drive,5,15,75,Cash,Alice,2023-10-27 10:50:30
+12,Power Supply,1,60,60,Debit Card,Bob,2023-10-27 10:55:45
+13,Graphics Card,1,400,400,Credit Card,Charlie,2023-10-27 11:00:00
+14,Motherboard,1,150,150,Cash,Alice,2023-10-27 11:05:15
+15,CPU,1,250,250,Debit Card,Bob,2023-10-27 11:10:30
+16,RAM,2,80,160,Credit Card,Charlie,2023-10-27 11:15:45
+17,SSD,1,120,120,Cash,Alice,2023-10-27 11:20:00
+18,Case,1,70,70,Debit Card,Bob,2023-10-27 11:25:15
+19,Fan,4,20,80,Credit Card,Charlie,2023-10-27 11:30:30
+20,Operating System,1,100,100,Cash,Alice,2023-10-27 11:35:45
+21,Laptop,1,1200,1200,Credit Card,Bob,2023-10-27 11:40:00
+22,Mouse,1,25,25,Cash,Charlie,2023-10-27 11:45:15
+23,Keyboard,1,75,75,Debit Card,Alice,2023-10-27 11:50:30
+24,Monitor,2,300,600,Credit Card,Bob,2023-10-27 11:55:45
+25,Webcam,1,50,50,Cash,Charlie,2023-10-27 12:00:00
+26,Printer,1,150,150,Debit Card,Alice,2023-10-27 12:05:15
+27,Headphones,1,40,40,Credit Card,Bob,2023-10-27 12:10:30
+28,Speakers,2,80,160,Cash,Charlie,2023-10-27 12:15:45
+29,Router,1,100,100,Debit Card,Alice,2023-10-27 12:20:00
+30,External Hard Drive,1,90,90,Credit Card,Bob,2023-10-27 12:25:15
+31,USB Drive,2,15,30,Cash,Charlie,2023-10-27 12:30:30
+32,Power Supply,1,60,60,Debit Card,Alice,2023-10-27 12:35:45
+33,Graphics Card,1,400,400,Credit Card,Bob,2023-10-27 12:40:00
+34,Motherboard,1,150,150,Cash,Charlie,2023-10-27 12:45:15
+35,CPU,1,250,250,Debit Card,Alice,2023-10-27 12:50:30
+36,RAM,1,80,80,Credit Card,Bob,2023-10-27 12:55:45
+37,SSD,2,120,240,Cash,Charlie,2023-10-27 13:00:00
+38,Case,1,70,70,Debit Card,Alice,2023-10-27 13:05:15
+39,Fan,3,20,60,Credit Card,Bob,2023-10-27 13:10:30
+40,Operating System,1,100,100,Cash,Charlie,2023-10-27 13:15:45
+41,Laptop,1,1200,1200,Credit Card,Alice,2023-10-27 13:20:00
+42,Mouse,1,25,25,Cash,Bob,2023-10-27 13:25:15
+43,Keyboard,2,75,150,Debit Card,Charlie,2023-10-27 13:30:30
+44,Monitor,1,300,300,Credit Card,Alice,2023-10-27 13:35:45
+45,Webcam,1,50,50,Cash,Bob,2023-10-27 13:40:00
+46,Printer,1,150,150,Debit Card,Charlie,2023-10-27 13:45:15
+47,Headphones,1,40,40,Credit Card,Alice,2023-10-27 13:50:30
+48,Speakers,1,80,80,Cash,Bob,2023-10-27 13:55:45
+49,Router,2,100,200,Debit Card,Charlie,2023-10-27 14:00:00
+50,External Hard Drive,1,90,90,Credit Card,Alice,2023-10-27 14:05:15
+51,USB Drive,1,15,15,Cash,Bob,2023-10-27 14:10:30
+52,Power Supply,1,60,60,Debit Card,Charlie,2023-10-27 14:15:45
+53,Graphics Card,1,400,400,Credit Card,Alice,2023-10-27 14:20:00
+54,Motherboard,2,150,300,Cash,Bob,2023-10-27 14:25:15
+55,CPU,1,250,250,Debit Card,Charlie,2023-10-27 14:30:30
+56,RAM,1,80,80,Credit Card,Alice,2023-10-27 14:35:45
+57,SSD,1,120,120,Cash,Bob,2023-10-27 14:40:00
+58,Case,2,70,140,Debit Card,Charlie,2023-10-27 14:45:15
+59,Fan,1,20,20,Credit Card,Alice,2023-10-27 14:50:30
+60,Operating System,1,100,100,Cash,Bob,2023-10-27 14:55:45
+61,Laptop,1,1200,1200,Credit Card,Charlie,2023-10-27 15:00:00
+62,Mouse,3,25,75,Cash,Alice,2023-10-27 15:05:15
+63,Keyboard,1,75,75,Debit Card,Bob,2023-10-27 15:10:30
+64,Monitor,1,300,300,Credit Card,Charlie,2023-10-27 15:15:45
+65,Webcam,2,50,100,Cash,Alice,2023-10-27 15:20:00
+66,Printer,1,150,150,Debit Card,Bob,2023-10-27 15:25:15
+67,Headphones,1,40,40,Credit Card,Charlie,2023-10-27 15:30:30
+68,Speakers,1,80,80,Cash,Alice,2023-10-27 15:35:45
+69,Router,1,100,100,Debit Card,Bob,2023-10-27 15:40:00
+70,External Hard Drive,2,90,180,Credit Card,Charlie,2023-10-27 15:45:15
+71,USB Drive,1,15,15,Cash,Alice,2023-10-27 15:50:30
+72,Power Supply,1,60,60,Debit Card,Bob,2023-10-27 15:55:45
+73,Graphics Card,1,400,400,Credit Card,Charlie,2023-10-27 16:00:00
+74,Motherboard,1,150,150,Cash,Alice,2023-10-27 16:05:15
+75,CPU,2,250,500,Debit Card,Bob,2023-10-27 16:10:30
+76,RAM,1,80,80,Credit Card,Charlie,2023-10-27 16:15:45
+77,SSD,1,120,120,Cash,Alice,2023-10-27 16:20:00
+78,Case,1,70,70,Debit Card,Bob,2023-10-27 16:25:15
+79,Fan,1,20,20,Credit Card,Charlie,2023-10-27 16:30:30
+80,Operating System,1,100,100,Cash,Alice,2023-10-27 16:35:45
+81,Laptop,1,1200,1200,Credit Card,Bob,2023-10-27 16:40:00
+82,Mouse,1,25,25,Cash,Charlie,2023-10-27 16:45:15
+83,Keyboard,1,75,75,Debit Card,Alice,2023-10-27 16:50:30
+84,Monitor,1,300,300,Credit Card,Bob,2023-10-27 16:55:45
+85,Webcam,1,50,50,Cash,Charlie,2023-10-27 17:00:00
+86,Printer,2,150,300,Debit Card,Alice,2023-10-27 17:05:15
+87,Headphones,1,40,40,Credit Card,Bob,2023-10-27 17:10:30
+88,Speakers,1,80,80,Cash,Charlie,2023-10-27 17:15:45
+89,Router,1,100,100,Debit Card,Alice,2023-10-27 17:20:00
+90,External Hard Drive,1,90,90,Credit Card,Bob,2023-10-27 17:25:15
+91,USB Drive,1,15,15,Cash,Charlie,2023-10-27 17:30:30
+92,Power Supply,2,60,120,Debit Card,Alice,2023-10-27 17:35:45
+93,Graphics Card,1,400,400,Credit Card,Bob,2023-10-27 17:40:00
+94,Motherboard,1,150,150,Cash,Charlie,2023-10-27 17:45:15
+95,CPU,1,250,250,Debit Card,Alice,2023-10-27 17:50:30
+96,RAM,1,80,80,Credit Card,Bob,2023-10-27 17:55:45
+97,SSD,1,120,120,Cash,Charlie,2023-10-27 18:00:00
+98,Case,1,70,70,Debit Card,Alice,2023-10-27 18:05:15
+99,Fan,2,20,40,Credit Card,Bob,2023-10-27 18:10:30
+100,Operating System,1,100,100,Cash,Charlie,2023-10-27 18:15:45
