@@ -134,6 +134,10 @@ export function InventoryManager() {
     return null; // Or a loading spinner
   }
 
+  const canEditPrices = user.role === ROLE.ADMIN;
+  const canDeleteItems = user.role === ROLE.ADMIN || user.role === ROLE.MANAGER;
+
+
   return (
     <>
       <div className="flex items-center justify-between">
@@ -184,7 +188,7 @@ export function InventoryManager() {
                           <DropdownMenuSeparator />
                            <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()} disabled={user.role === ROLE.CASHIER}>Delete</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()} disabled={!canDeleteItems}>Delete</DropdownMenuItem>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
@@ -255,7 +259,7 @@ export function InventoryManager() {
                 value={editingDrink?.costPrice || ''} 
                 onChange={(e) => handleFieldChange('costPrice', +e.target.value)} 
                 className="col-span-3"
-                disabled={user.role === ROLE.CASHIER}
+                disabled={!canEditPrices}
               />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
@@ -266,7 +270,7 @@ export function InventoryManager() {
                 value={editingDrink?.sellingPrice || ''} 
                 onChange={(e) => handleFieldChange('sellingPrice', +e.target.value)} 
                 className="col-span-3"
-                disabled={user.role === ROLE.CASHIER}
+                disabled={!canEditPrices}
               />
             </div>
              {editingDrink?.unit === 'ml' && (

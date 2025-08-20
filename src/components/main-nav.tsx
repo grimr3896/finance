@@ -1,3 +1,4 @@
+
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -37,25 +38,25 @@ const allLinks = [
     href: "/inventory",
     label: "Inventory",
     icon: Beer,
-    allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
+    allowedRoles: [ROLE.ADMIN, ROLE.MANAGER],
   },
   {
     href: "/employees",
     label: "Employees",
     icon: Users,
-    allowedRoles: [ROLE.ADMIN],
+    allowedRoles: [ROLE.ADMIN, ROLE.MANAGER],
   },
   {
     href: "/reports",
     label: "Reports",
     icon: BarChart3,
-    allowedRoles: [ROLE.ADMIN],
+    allowedRoles: [ROLE.ADMIN, ROLE.MANAGER],
   },
   {
     href: "/forecasting",
     label: "AI Forecasting",
     icon: BrainCircuit,
-    allowedRoles: [ROLE.ADMIN],
+    allowedRoles: [ROLE.ADMIN, ROLE.MANAGER],
   },
   {
     href: "/anomaly-detection",
@@ -67,7 +68,7 @@ const allLinks = [
     href: "/customer-support",
     label: "Customer Support",
     icon: MessageSquare,
-    allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
+    allowedRoles: [ROLE.ADMIN, ROLE.SUPPORT_STAFF],
   },
 ];
 

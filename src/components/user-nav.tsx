@@ -26,8 +26,8 @@ export function UserNav() {
   if (!user) return null;
 
   const handleRoleChange = (role: string) => {
-    if (role === ROLE.ADMIN || role === ROLE.CASHIER) {
-      setUser({ ...user, role: role as 'admin' | 'cashier' });
+    if (Object.values(ROLE).includes(role as any)) {
+      setUser({ ...user, role: role as any });
     }
   };
 
@@ -54,7 +54,9 @@ export function UserNav() {
         <DropdownMenuRadioGroup value={user.role} onValueChange={handleRoleChange}>
           <DropdownMenuLabel>Switch Role (for demo)</DropdownMenuLabel>
           <DropdownMenuRadioItem value={ROLE.ADMIN}>Admin</DropdownMenuRadioItem>
+           <DropdownMenuRadioItem value={ROLE.MANAGER}>Manager</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value={ROLE.CASHIER}>Cashier</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value={ROLE.SUPPORT_STAFF}>Support Staff</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
