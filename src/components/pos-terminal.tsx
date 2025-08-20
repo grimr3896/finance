@@ -35,6 +35,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { Receipt } from "@/components/receipt";
+import { requestMpesaPayment } from "@/ai/flows/mpesa-stk-push";
 
 const availableDrinks: Drink[] = [
     { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202', image: "https://placehold.co/150x150.png" },
@@ -65,7 +66,7 @@ export function PosTerminal() {
   const [lastSale, setLastSale] = useState<CompletedSale | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"Cash" | "M-Pesa" | null>(null);
   const [cashReceived, setCashReceived] = useState("");
-  const [mpesaStep, setMpesaStep] = useState<'enterPhone' | 'pending' | 'success'>('enterPhone');
+  const [mpesaStep, setMpesaStep] = useState<'enterPhone' | 'pending' | 'success' | 'failed'>('enterPhone');
   const [customerPhone, setCustomerPhone] = useState("");
   const router = useRouter();
   const { toast } = useToast();
@@ -136,7 +137,7 @@ export function PosTerminal() {
     setPaymentMethod(null);
   }
 
-  const handleConfirmPayment = () => {
+  const handleConfirmPayment = (mpesaReceiptNumber?: string) => {
     const sale: Sale = {
         id: `SALE${Date.now()}`,
         items: cart.map(item => ({
@@ -148,6 +149,7 @@ export function PosTerminal() {
         paymentMethod: paymentMethod!,
         cashier: "John Doe", // Replace with actual logged in user
         timestamp: new Date().toISOString(),
+        mpesaReceipt: mpesaReceiptNumber,
     };
     
     setLastSale({
@@ -166,27 +168,47 @@ export function PosTerminal() {
     })
   };
   
-   const handleMpesaPayment = () => {
+  const handleMpesaPayment = async () => {
     if (customerPhone.length < 10) {
-        toast({
-            variant: "destructive",
-            title: "Invalid Phone Number",
-            description: "Please enter a valid phone number.",
-        });
-        return;
+      toast({
+        variant: 'destructive',
+        title: 'Invalid Phone Number',
+        description: 'Please enter a valid phone number.',
+      });
+      return;
     }
-    
-    setMpesaStep('pending');
-    
-    // Simulate API call and callback
-    setTimeout(() => {
-      setMpesaStep('success');
-      setTimeout(() => {
-        handleConfirmPayment();
-      }, 1000); // Wait a second on success message before closing
-    }, 3000);
-  };
 
+    setMpesaStep('pending');
+
+    try {
+      const result = await requestMpesaPayment({
+        phoneNumber: customerPhone,
+        amount: total,
+      });
+
+      if (result.success) {
+        setMpesaStep('success');
+        setTimeout(() => {
+          handleConfirmPayment(result.mpesaReceiptNumber);
+        }, 1500);
+      } else {
+        setMpesaStep('failed');
+        toast({
+          variant: 'destructive',
+          title: 'Payment Failed',
+          description: result.message,
+        });
+      }
+    } catch (error) {
+      console.error('M-Pesa payment error:', error);
+      setMpesaStep('failed');
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'An unexpected error occurred during payment.',
+      });
+    }
+  };
 
   const changeDue = useMemo(() => {
     if (paymentMethod !== 'Cash') return 0;
@@ -341,8 +363,8 @@ export function PosTerminal() {
                     {mpesaStep === 'pending' && (
                          <div className="flex flex-col items-center justify-center space-y-2">
                             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                            <p className="text-muted-foreground">Sending STK push...</p>
-                            <p>Awaiting payment from customer.</p>
+                            <p className="text-muted-foreground">Sending STK push to customer...</p>
+                            <p>Awaiting payment confirmation.</p>
                         </div>
                     )}
                      {mpesaStep === 'success' && (
@@ -352,6 +374,13 @@ export function PosTerminal() {
                             <p>Finalizing sale...</p>
                         </div>
                     )}
+                     {mpesaStep === 'failed' && (
+                         <div className="flex flex-col items-center justify-center space-y-2 text-destructive">
+                            <CheckCircle className="h-8 w-8" />
+                            <p className="font-semibold">Payment Failed</p>
+                            <p>Please try again or use another payment method.</p>
+                        </div>
+                    )}
                 </div>
             )}
             <DialogFooter>
@@ -359,7 +388,7 @@ export function PosTerminal() {
                 {paymentMethod === 'Cash' ? (
                     <Button 
                         type="submit" 
-                        onClick={handleConfirmPayment}
+                        onClick={() => handleConfirmPayment()}
                         disabled={parseFloat(cashReceived) < total || isNaN(parseFloat(cashReceived))}
                     >
                         Confirm Payment

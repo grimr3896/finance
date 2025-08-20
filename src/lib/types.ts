@@ -28,6 +28,7 @@ export type Sale = {
   paymentMethod: 'Cash' | 'Mpesa';
   cashier: string;
   timestamp: string;
+  mpesaReceipt?: string;
 };
 
 export type Expense = {

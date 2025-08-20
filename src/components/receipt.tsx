@@ -29,6 +29,12 @@ export function Receipt({ sale, cashReceived, changeDue }: ReceiptProps) {
         <span>Receipt No:</span>
         <span>{sale.id}</span>
       </div>
+       {sale.mpesaReceipt && (
+         <div className="flex justify-between">
+            <span>M-Pesa Receipt:</span>
+            <span className="truncate">{sale.mpesaReceipt}</span>
+        </div>
+       )}
       <div className="flex justify-between">
         <span>Date:</span>
         <span>{formatDate(sale.timestamp)}</span>
