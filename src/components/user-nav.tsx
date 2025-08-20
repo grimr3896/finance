@@ -1,3 +1,4 @@
+
 "use client";
 
 import {
@@ -50,7 +51,7 @@ export function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuRadioGroup value={user.role} onValueChange={handleRoleChange}>
+        <DropdownMenuRadioGroup value={user.role} onValuechange={handleRoleChange}>
           <DropdownMenuLabel>Switch Role (for demo)</DropdownMenuLabel>
           <DropdownMenuRadioItem value={ROLE.ADMIN}>Admin</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value={ROLE.CASHIER}>Cashier</DropdownMenuRadioItem>
