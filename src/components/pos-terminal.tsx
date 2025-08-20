@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, MinusCircle, Search, ScanBarcode, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { PlusCircle, MinusCircle, Search, ScanBarcode, Loader2 } from "lucide-react";
 import type { Drink, Sale } from "@/lib/types";
 import {
   Dialog,
@@ -29,13 +29,11 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { Receipt } from "@/components/receipt";
-import { requestMpesaPayment } from "@/ai/flows/mpesa-stk-push";
 
 const availableDrinks: Drink[] = [
     { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202', image: "https://placehold.co/150x150.png" },
@@ -64,10 +62,10 @@ export function PosTerminal() {
   const [isCashoutOpen, setIsCashoutOpen] = useState(false);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [lastSale, setLastSale] = useState<CompletedSale | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<"Cash" | "M-Pesa" | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"Cash" | "Card" | "Mpesa" | null>(null);
   const [cashReceived, setCashReceived] = useState("");
-  const [mpesaStep, setMpesaStep] = useState<'enterPhone' | 'pending' | 'success' | 'failed'>('enterPhone');
-  const [customerPhone, setCustomerPhone] = useState("");
+  const [mpesaPhone, setMpesaPhone] = useState("");
+  const [mpesaCode, setMpesaCode] = useState("");
   const router = useRouter();
   const { toast } = useToast();
 
@@ -116,7 +114,7 @@ export function PosTerminal() {
     drink.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
-  const openCashoutModal = (method: "Cash" | "M-Pesa") => {
+  const openCashoutModal = (method: "Cash" | "Card" | "Mpesa") => {
     if (cart.length === 0) {
         toast({
             variant: "destructive",
@@ -132,12 +130,12 @@ export function PosTerminal() {
   const resetCashout = () => {
     setIsCashoutOpen(false);
     setCashReceived("");
-    setCustomerPhone("");
-    setMpesaStep('enterPhone');
+    setMpesaPhone("");
+    setMpesaCode("");
     setPaymentMethod(null);
   }
 
-  const handleConfirmPayment = (mpesaReceiptNumber?: string) => {
+  const handleConfirmPayment = () => {
     const sale: Sale = {
         id: `SALE${Date.now()}`,
         items: cart.map(item => ({
@@ -149,7 +147,8 @@ export function PosTerminal() {
         paymentMethod: paymentMethod!,
         cashier: "John Doe", // Replace with actual logged in user
         timestamp: new Date().toISOString(),
-        mpesaReceipt: mpesaReceiptNumber,
+        mpesaReceipt: paymentMethod === 'Mpesa' ? mpesaCode : undefined,
+        mpesaPhone: paymentMethod === 'Mpesa' ? mpesaPhone : undefined,
     };
     
     setLastSale({
@@ -166,48 +165,6 @@ export function PosTerminal() {
         title: "Sale Completed",
         description: `Payment of Ksh ${total.toFixed(2)} received via ${paymentMethod}.`,
     })
-  };
-  
-  const handleMpesaPayment = async () => {
-    if (customerPhone.length < 10) {
-      toast({
-        variant: 'destructive',
-        title: 'Invalid Phone Number',
-        description: 'Please enter a valid phone number.',
-      });
-      return;
-    }
-
-    setMpesaStep('pending');
-
-    try {
-      const result = await requestMpesaPayment({
-        phoneNumber: customerPhone,
-        amount: total,
-      });
-
-      if (result.success) {
-        setMpesaStep('success');
-        setTimeout(() => {
-          handleConfirmPayment(result.mpesaReceiptNumber);
-        }, 1500);
-      } else {
-        setMpesaStep('failed');
-        toast({
-          variant: 'destructive',
-          title: 'Payment Failed',
-          description: result.message,
-        });
-      }
-    } catch (error) {
-      console.error('M-Pesa payment error:', error);
-      setMpesaStep('failed');
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: 'An unexpected error occurred during payment.',
-      });
-    }
   };
 
   const changeDue = useMemo(() => {
@@ -309,9 +266,10 @@ export function PosTerminal() {
                   <span>Total</span>
                   <span className="text-primary">Ksh {total.toFixed(2)}</span>
               </div>
-              <div className="mt-4 grid w-full grid-cols-2 gap-2">
+              <div className="mt-4 grid w-full grid-cols-3 gap-2">
                   <Button size="lg" variant="secondary" onClick={() => openCashoutModal('Cash')} disabled={cart.length === 0}>Cash</Button>
-                  <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => openCashoutModal('M-Pesa')} disabled={cart.length === 0}>M-Pesa</Button>
+                  <Button size="lg" variant="outline" onClick={() => openCashoutModal('Card')} disabled={cart.length === 0}>Card</Button>
+                  <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => openCashoutModal('Mpesa')} disabled={cart.length === 0}>M-Pesa</Button>
               </div>
             </CardFooter>
           </Card>
@@ -345,42 +303,33 @@ export function PosTerminal() {
                     </div>
                 </div>
             )}
-            {paymentMethod === 'M-Pesa' && (
-                 <div className="py-4">
-                    {mpesaStep === 'enterPhone' && (
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="phone-number" className="text-right">Phone Number</Label>
-                            <Input 
-                                id="phone-number" 
-                                type="tel"
-                                value={customerPhone}
-                                onChange={(e) => setCustomerPhone(e.target.value)}
-                                className="col-span-3" 
-                                placeholder="e.g. 0712345678"
-                            />
-                        </div>
-                    )}
-                    {mpesaStep === 'pending' && (
-                         <div className="flex flex-col items-center justify-center space-y-2">
-                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                            <p className="text-muted-foreground">Sending STK push to customer...</p>
-                            <p>Awaiting payment confirmation.</p>
-                        </div>
-                    )}
-                     {mpesaStep === 'success' && (
-                         <div className="flex flex-col items-center justify-center space-y-2 text-emerald-500">
-                            <CheckCircle className="h-8 w-8" />
-                            <p className="font-semibold">Payment Received!</p>
-                            <p>Finalizing sale...</p>
-                        </div>
-                    )}
-                     {mpesaStep === 'failed' && (
-                         <div className="flex flex-col items-center justify-center space-y-2 text-destructive">
-                            <XCircle className="h-8 w-8" />
-                            <p className="font-semibold">Payment Failed</p>
-                            <p>Please try again or use another payment method.</p>
-                        </div>
-                    )}
+            {paymentMethod === 'Card' && (
+                 <div className="py-4 text-center">
+                    <p>Process card payment on the physical terminal.</p>
+                </div>
+            )}
+            {paymentMethod === 'Mpesa' && (
+                 <div className="space-y-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="mpesa-code" className="text-right">Transaction Code</Label>
+                        <Input 
+                            id="mpesa-code" 
+                            value={mpesaCode}
+                            onChange={(e) => setMpesaCode(e.target.value)}
+                            className="col-span-3" 
+                            placeholder="(Optional)"
+                        />
+                    </div>
+                     <div className="grid grid-cols-4 items-center gap-4">
+                        <Label htmlFor="mpesa-phone" className="text-right">Phone Number</Label>
+                        <Input 
+                            id="mpesa-phone" 
+                            value={mpesaPhone}
+                            onChange={(e) => setMpesaPhone(e.target.value)}
+                            className="col-span-3" 
+                            placeholder="(Optional)"
+                        />
+                    </div>
                 </div>
             )}
             <DialogFooter>
@@ -388,7 +337,7 @@ export function PosTerminal() {
                 {paymentMethod === 'Cash' ? (
                     <Button 
                         type="submit" 
-                        onClick={() => handleConfirmPayment()}
+                        onClick={handleConfirmPayment}
                         disabled={parseFloat(cashReceived) < total || isNaN(parseFloat(cashReceived))}
                     >
                         Confirm Payment
@@ -396,14 +345,9 @@ export function PosTerminal() {
                 ) : (
                      <Button 
                         type="button" 
-                        onClick={handleMpesaPayment}
-                        disabled={(mpesaStep === 'pending' || mpesaStep === 'success') || (mpesaStep === 'enterPhone' && customerPhone.length < 10)}
+                        onClick={handleConfirmPayment}
                     >
-                        {mpesaStep === 'pending' ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : mpesaStep === 'failed' ? (
-                            "Retry"
-                        ) : "Request Payment"}
+                       Confirm Payment
                     </Button>
                 )}
             </DialogFooter>

@@ -25,10 +25,11 @@ export type Sale = {
     price: number;
   }[];
   total: number;
-  paymentMethod: 'Cash' | 'Mpesa';
+  paymentMethod: 'Cash' | 'Mpesa' | 'Card';
   cashier: string;
   timestamp: string;
   mpesaReceipt?: string;
+  mpesaPhone?: string;
 };
 
 export type Expense = {
