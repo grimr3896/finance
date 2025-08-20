@@ -18,56 +18,74 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "@/components/ui/sidebar";
+import { useAuth, ROLE } from "@/lib/auth";
 
-const links = [
+const allLinks = [
   {
     href: "/dashboard",
     label: "Dashboard",
     icon: LayoutDashboard,
+    allowedRoles: [ROLE.ADMIN],
   },
   {
     href: "/pos",
     label: "Point of Sale",
     icon: ShoppingCart,
+    allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
   },
   {
     href: "/inventory",
     label: "Inventory",
     icon: Beer,
+    allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
   },
   {
     href: "/employees",
     label: "Employees",
     icon: Users,
+    allowedRoles: [ROLE.ADMIN],
   },
   {
     href: "/reports",
     label: "Reports",
     icon: BarChart3,
+    allowedRoles: [ROLE.ADMIN],
   },
   {
     href: "/forecasting",
     label: "AI Forecasting",
     icon: BrainCircuit,
+    allowedRoles: [ROLE.ADMIN],
   },
   {
     href: "/anomaly-detection",
     label: "Anomaly Detection",
     icon: ShieldAlert,
+    allowedRoles: [ROLE.ADMIN],
   },
   {
     href: "/customer-support",
     label: "Customer Support",
     icon: MessageSquare,
+    allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
   },
 ];
 
 export function MainNav() {
   const pathname = usePathname();
+  const { user } = useAuth();
+
+  if (!user) {
+    return null; // Or a loading skeleton
+  }
+
+  const accessibleLinks = allLinks.filter(link => 
+    link.allowedRoles.includes(user.role)
+  );
 
   return (
     <SidebarMenu>
-      {links.map((link) => (
+      {accessibleLinks.map((link) => (
         <SidebarMenuItem key={link.href}>
           <SidebarMenuButton
             asChild
