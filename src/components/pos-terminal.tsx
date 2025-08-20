@@ -20,7 +20,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, MinusCircle, Search, ScanBarcode } from "lucide-react";
+import { PlusCircle, MinusCircle, Search, ScanBarcode, XCircle } from "lucide-react";
 import type { Drink, Sale } from "@/lib/types";
 import {
   Dialog,
@@ -58,18 +58,53 @@ type CompletedSale = {
 }
 
 export function PosTerminal() {
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    try {
+      const savedCart = localStorage.getItem("pos-cart");
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error("Failed to load cart from localStorage", error);
+      return [];
+    }
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const [isCashoutOpen, setIsCashoutOpen] = useState(false);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [lastSale, setLastSale] = useState<CompletedSale | null>(null);
-  const [salesHistory, setSalesHistory] = useState<CompletedSale[]>([]);
+  const [salesHistory, setSalesHistory] = useState<CompletedSale[]>(() => {
+     try {
+      const savedHistory = localStorage.getItem("pos-sales-history");
+      return savedHistory ? JSON.parse(savedHistory) : [];
+    } catch (error) {
+      console.error("Failed to load sales history from localStorage", error);
+      return [];
+    }
+  });
   const [paymentMethod, setPaymentMethod] = useState<"Cash" | "Card" | "Mpesa" | null>(null);
   const [cashReceived, setCashReceived] = useState("");
   const [mpesaPhone, setMpesaPhone] = useState("");
   const [mpesaCode, setMpesaCode] = useState("");
   const router = useRouter();
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Save cart to localStorage whenever it changes
+    try {
+        localStorage.setItem("pos-cart", JSON.stringify(cart));
+    } catch (error) {
+        console.error("Failed to save cart to localStorage", error);
+    }
+  }, [cart]);
+
+  useEffect(() => {
+    // Save sales history to localStorage whenever it changes
+    try {
+      localStorage.setItem("pos-sales-history", JSON.stringify(salesHistory));
+    } catch (error) {
+        console.error("Failed to save sales history to localStorage", error);
+    }
+  }, [salesHistory]);
+
 
   useEffect(() => {
     const scannedDrinkId = localStorage.getItem("scannedDrinkId");
@@ -110,6 +145,10 @@ export function PosTerminal() {
     setCart((prevCart) => prevCart.filter((item) => item.drink.id !== drinkId));
   };
   
+  const clearCart = () => {
+    setCart([]);
+  }
+
   const total = useMemo(() => cart.reduce((sum, item) => sum + item.drink.sellingPrice * item.quantity, 0), [cart]);
 
   const filteredDrinks = availableDrinks.filter(drink => 
@@ -237,6 +276,7 @@ export function PosTerminal() {
                             <p className="text-muted-foreground">Cart is empty</p>
                         </div>
                     ) : (
+                      <>
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -267,6 +307,12 @@ export function PosTerminal() {
                             ))}
                             </TableBody>
                         </Table>
+                         <div className="p-2 mt-4">
+                            <Button variant="outline" className="w-full" onClick={clearCart}>
+                                <XCircle className="mr-2 h-4 w-4" /> Clear Cart
+                            </Button>
+                        </div>
+                        </>
                     )}
                 </TabsContent>
                 <TabsContent value="history" className="m-0 h-full">
