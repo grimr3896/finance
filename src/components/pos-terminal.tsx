@@ -20,8 +20,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { PlusCircle, MinusCircle, Search, ScanBarcode, X } from "lucide-react";
-import type { Drink } from "@/lib/types";
+import { PlusCircle, MinusCircle, Search, ScanBarcode } from "lucide-react";
+import type { Drink, Sale } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -29,10 +29,12 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogClose,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
+import { Receipt } from "@/components/receipt";
 
 const availableDrinks: Drink[] = [
     { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202', image: "https://placehold.co/150x150.png" },
@@ -49,10 +51,18 @@ type CartItem = {
     quantity: number;
 };
 
+type CompletedSale = {
+  sale: Sale;
+  cashReceived?: number;
+  changeDue: number;
+}
+
 export function PosTerminal() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isCashoutOpen, setIsCashoutOpen] = useState(false);
+  const [isReceiptOpen, setIsReceiptOpen] = useState(false);
+  const [lastSale, setLastSale] = useState<CompletedSale | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"Cash" | "M-Pesa" | null>(null);
   const [cashReceived, setCashReceived] = useState("");
   const router = useRouter();
@@ -117,26 +127,31 @@ export function PosTerminal() {
   };
 
   const handleConfirmPayment = () => {
-    // In a real app, you would handle payment processing here
-    // For M-Pesa, trigger STK push. For Cash, just record the sale.
-    
-    // 1. Record the sale in sales history
-    console.log({
-        items: cart,
+    const sale: Sale = {
+        id: `SALE${Date.now()}`,
+        items: cart.map(item => ({
+            drinkName: item.drink.name,
+            quantity: item.quantity,
+            price: item.drink.sellingPrice,
+        })),
         total,
-        paymentMethod,
-        cashReceived: paymentMethod === 'Cash' ? parseFloat(cashReceived) : total,
+        paymentMethod: paymentMethod!,
+        cashier: "John Doe", // Replace with actual logged in user
+        timestamp: new Date().toISOString(),
+    };
+    
+    setLastSale({
+      sale,
+      cashReceived: paymentMethod === 'Cash' ? parseFloat(cashReceived) : undefined,
+      changeDue,
     });
-    
-    // 2. Update inventory levels
-    
-    // 3. Print receipt
     
     // 4. Reset for new order
     setCart([]);
     setCashReceived("");
     setIsCashoutOpen(false);
     setPaymentMethod(null);
+    setIsReceiptOpen(true);
     
     toast({
         title: "Sale Completed",
@@ -154,16 +169,16 @@ export function PosTerminal() {
 
   return (
     <>
-      <div className="grid h-[calc(100vh-4rem)] grid-cols-1 gap-4 lg:grid-cols-3">
+      <div className="grid h-[calc(100vh-8rem)] grid-cols-1 gap-4 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <Card className="h-full flex flex-col bg-transparent border-0 shadow-none">
+          <Card className="h-full flex flex-col bg-card/50">
               <CardHeader>
                   <CardTitle className="font-headline text-primary">Available Drinks</CardTitle>
                   <div className="relative mt-2 flex gap-2">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input 
                           placeholder="Search for a drink..." 
-                          className="pl-8 bg-card border-border" 
+                          className="pl-8" 
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                       />
@@ -172,19 +187,20 @@ export function PosTerminal() {
                       </Button>
                   </div>
               </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-1 overflow-y-auto p-2">
+            <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-1 overflow-y-auto p-4">
               {filteredDrinks.map((drink) => (
                 <Card
                   key={drink.id}
-                  className="overflow-hidden cursor-pointer group border-border/50 hover:border-primary transition-all duration-200 ease-in-out shadow-sm hover:shadow-lg hover:shadow-primary/20"
+                  className="overflow-hidden cursor-pointer group border-border/50 hover:border-primary transition-all duration-200 ease-in-out shadow-sm hover:shadow-lg hover:shadow-primary/20 bg-card"
                   onClick={() => addToCart(drink)}
                 >
-                  <div className="aspect-square relative">
+                  <div className="aspect-square relative overflow-hidden">
                     {drink.image && (
-                      <Image src={drink.image} alt={drink.name} fill className="object-cover" data-ai-hint="drink bottle" />
+                      <Image src={drink.image} alt={drink.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" data-ai-hint="drink bottle" />
                     )}
+                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   </div>
-                  <div className="p-2 text-center bg-card">
+                  <div className="p-2 text-center">
                     <p className="text-sm font-medium text-foreground truncate">{drink.name}</p>
                     <p className="text-xs text-primary font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
                   </div>
@@ -199,7 +215,7 @@ export function PosTerminal() {
             <CardHeader>
               <CardTitle className="font-headline text-primary">Current Order</CardTitle>
             </CardHeader>
-            <CardContent className="flex-1 overflow-y-auto">
+            <CardContent className="flex-1 overflow-y-auto p-2">
               {cart.length === 0 ? (
                   <div className="flex h-full items-center justify-center">
                       <p className="text-muted-foreground">Cart is empty</p>
@@ -243,8 +259,8 @@ export function PosTerminal() {
                   <span className="text-primary">Ksh {total.toFixed(2)}</span>
               </div>
               <div className="mt-4 grid w-full grid-cols-2 gap-2">
-                  <Button size="lg" variant="secondary" onClick={() => openCashoutModal('Cash')}>Cash</Button>
-                  <Button size="lg" className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openCashoutModal('M-Pesa')}>M-Pesa</Button>
+                  <Button size="lg" variant="secondary" onClick={() => openCashoutModal('Cash')} disabled={cart.length === 0}>Cash</Button>
+                  <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white" onClick={() => openCashoutModal('M-Pesa')} disabled={cart.length === 0}>M-Pesa</Button>
               </div>
             </CardFooter>
           </Card>
@@ -279,7 +295,7 @@ export function PosTerminal() {
                 </div>
             )}
             {paymentMethod === 'M-Pesa' && (
-                <div className="py-4 text-center">
+                <div className="py-8 text-center">
                     <p className="text-muted-foreground">
                         An STK push will be sent to the customer's phone to complete the payment of <strong>Ksh {total.toFixed(2)}</strong>.
                     </p>
@@ -294,6 +310,19 @@ export function PosTerminal() {
                 >
                     Confirm Payment
                 </Button>
+            </DialogFooter>
+        </DialogContent>
+      </Dialog>
+      
+       <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
+        <DialogContent className="sm:max-w-sm">
+            <DialogHeader>
+                <DialogTitle className="font-headline text-primary">Transaction Receipt</DialogTitle>
+            </DialogHeader>
+            {lastSale && <Receipt sale={lastSale.sale} cashReceived={lastSale.cashReceived} changeDue={lastSale.changeDue} />}
+            <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setIsReceiptOpen(false)}>Close</Button>
+                <Button type="button">Print</Button>
             </DialogFooter>
         </DialogContent>
       </Dialog>
