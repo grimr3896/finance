@@ -20,13 +20,10 @@ const nextConfig: NextConfig = {
   },
   webpack: (config, { isServer }) => {
     if (!isServer) {
-        config.resolve.fallback = {
-            ...config.resolve.fallback,
-            async_hooks: false,
-        };
+      config.externals.push('async_hooks');
     }
     return config;
-  }
+  },
 };
 
 export default nextConfig;
