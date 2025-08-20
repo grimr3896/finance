@@ -13,8 +13,11 @@ export type Drink = {
 export type Employee = {
   id: string;
   name: string;
-  role: 'Admin' | 'Cashier';
-  status: 'Clocked In' | 'Clocked Out';
+  role: 'Admin' | 'Manager' | 'Cashier' | 'Support Staff';
+  status: 'Clocked In' | 'Clocked Out' | 'On Leave';
+  email: string;
+  phone: string;
+  dateJoined: string; // ISO 8601 format
 };
 
 export type Sale = {

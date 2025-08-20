@@ -19,7 +19,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -31,7 +30,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PlusCircle, MoreHorizontal } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { PlusCircle, MoreHorizontal, CalendarIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,25 +45,30 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import type { Employee } from "@/lib/types";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 const initialEmployees: Employee[] = [
-  { id: "EMP001", name: "John Doe", role: "Admin", status: "Clocked In" },
-  { id: "EMP002", name: "Jane Smith", role: "Cashier", status: "Clocked Out" },
-  { id: "EMP003", name: "Peter Jones", role: "Cashier", status: "Clocked In" },
+  { id: "EMP001", name: "John Doe", role: "Admin", status: "Clocked In", email: "john.doe@example.com", phone: "0712345678", dateJoined: "2023-01-15" },
+  { id: "EMP002", name: "Jane Smith", role: "Manager", status: "Clocked Out", email: "jane.smith@example.com", phone: "0723456789", dateJoined: "2022-05-20" },
+  { id: "EMP003", name: "Peter Jones", role: "Cashier", status: "Clocked In", email: "peter.jones@example.com", phone: "0734567890", dateJoined: "2023-08-01" },
+  { id: "EMP004", name: "Maryanne Bee", role: "Support Staff", status: "On Leave", email: "maryanne.bee@example.com", phone: "0745678901", dateJoined: "2024-02-10" },
 ];
 
 export function EmployeeManager() {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState<Employee | null>(null);
+  const [editingEmployee, setEditingEmployee] = useState<Partial<Employee> | null>(null);
+  const [date, setDate] = useState<Date>()
 
   const handleAddNew = () => {
-    setEditingEmployee(null);
+    setEditingEmployee({});
     setIsDialogOpen(true);
   };
   
   const handleEdit = (employee: Employee) => {
     setEditingEmployee(employee);
+    setDate(new Date(employee.dateJoined));
     setIsDialogOpen(true);
   };
 
@@ -73,6 +83,14 @@ export function EmployeeManager() {
         emp.id === id ? { ...emp, status: emp.status === 'Clocked In' ? 'Clocked Out' : 'Clocked In' } : emp
     ));
   };
+  
+  const getStatusBadgeVariant = (status: Employee['status']) => {
+    switch (status) {
+      case 'Clocked In': return 'bg-emerald-600 text-emerald-50 hover:bg-emerald-600/80';
+      case 'On Leave': return 'bg-blue-500 text-blue-50 hover:bg-blue-500/80';
+      default: return 'secondary';
+    }
+  }
 
 
   return (
@@ -93,6 +111,8 @@ export function EmployeeManager() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>Role</TableHead>
+                <TableHead>Contact</TableHead>
+                <TableHead>Date Joined</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -102,8 +122,13 @@ export function EmployeeManager() {
                 <TableRow key={employee.id}>
                   <TableCell className="font-medium">{employee.name}</TableCell>
                   <TableCell>{employee.role}</TableCell>
+                   <TableCell>
+                      <div className="text-sm">{employee.email}</div>
+                      <div className="text-xs text-muted-foreground">{employee.phone}</div>
+                    </TableCell>
+                  <TableCell>{format(new Date(employee.dateJoined), "PPP")}</TableCell>
                   <TableCell>
-                    <Badge variant={employee.status === 'Clocked In' ? 'default' : 'secondary'} className={employee.status === 'Clocked In' ? 'bg-emerald-600 text-emerald-50 hover:bg-emerald-600/80' : ''}>
+                    <Badge variant={'default'} className={getStatusBadgeVariant(employee.status)}>
                       {employee.status}
                     </Badge>
                   </TableCell>
@@ -132,12 +157,20 @@ export function EmployeeManager() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="font-headline">{editingEmployee ? "Edit Employee" : "Add New Employee"}</DialogTitle>
+            <DialogTitle className="font-headline">{editingEmployee?.id ? "Edit Employee" : "Add New Employee"}</DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">Name</Label>
               <Input id="name" defaultValue={editingEmployee?.name} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="email" className="text-right">Email</Label>
+              <Input id="email" type="email" defaultValue={editingEmployee?.email} className="col-span-3" />
+            </div>
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="phone" className="text-right">Phone</Label>
+              <Input id="phone" defaultValue={editingEmployee?.phone} className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">Role</Label>
@@ -147,9 +180,36 @@ export function EmployeeManager() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Admin">Admin</SelectItem>
+                  <SelectItem value="Manager">Manager</SelectItem>
                   <SelectItem value="Cashier">Cashier</SelectItem>
+                  <SelectItem value="Support Staff">Support Staff</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+               <Label htmlFor="dateJoined" className="text-right">Date Joined</Label>
+               <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "col-span-3 justify-start text-left font-normal",
+                      !date && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={date}
+                    onSelect={setDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
           <DialogFooter>
