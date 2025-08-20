@@ -13,7 +13,7 @@ export type Drink = {
 export type Employee = {
   id: string;
   name: string;
-  role: 'Admin' | 'Manager' | 'Cashier' | 'Support Staff';
+  role: 'Admin' | 'Cashier';
   status: 'Clocked In' | 'Clocked Out' | 'On Leave';
   email: string;
   phone: string;

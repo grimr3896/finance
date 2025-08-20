@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -50,9 +51,7 @@ import { cn } from "@/lib/utils";
 
 const initialEmployees: Employee[] = [
   { id: "EMP001", name: "John Doe", role: "Admin", status: "Clocked In", email: "john.doe@example.com", phone: "0712345678", dateJoined: "2023-01-15" },
-  { id: "EMP002", name: "Jane Smith", role: "Manager", status: "Clocked Out", email: "jane.smith@example.com", phone: "0723456789", dateJoined: "2022-05-20" },
   { id: "EMP003", name: "Peter Jones", role: "Cashier", status: "Clocked In", email: "peter.jones@example.com", phone: "0734567890", dateJoined: "2023-08-01" },
-  { id: "EMP004", name: "Maryanne Bee", role: "Support Staff", status: "On Leave", email: "maryanne.bee@example.com", phone: "0745678901", dateJoined: "2024-02-10" },
 ];
 
 export function EmployeeManager() {
@@ -180,9 +179,7 @@ export function EmployeeManager() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="Admin">Admin</SelectItem>
-                  <SelectItem value="Manager">Manager</SelectItem>
                   <SelectItem value="Cashier">Cashier</SelectItem>
-                  <SelectItem value="Support Staff">Support Staff</SelectItem>
                 </SelectContent>
               </Select>
             </div>

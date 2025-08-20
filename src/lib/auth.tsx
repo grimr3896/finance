@@ -5,9 +5,7 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 export const ROLE = {
   ADMIN: "admin",
-  MANAGER: "manager",
   CASHIER: "cashier",
-  SUPPORT_STAFF: "support_staff",
 } as const;
 
 type Role = typeof ROLE[keyof typeof ROLE];
@@ -25,24 +23,11 @@ const mockAdmin: User = {
   role: ROLE.ADMIN,
 };
 
-const mockManager: User = {
-  name: "Manager User",
-  email: "manager@barbuddy.app",
-  role: ROLE.MANAGER,
-};
-
 const mockCashier: User = {
     name: "Cashier User",
     email: "cashier@barbuddy.app",
     role: ROLE.CASHIER,
 };
-
-const mockSupport: User = {
-    name: "Support Staff",
-    email: "support@barbuddy.app",
-    role: ROLE.SUPPORT_STAFF,
-};
-
 
 interface AuthContextType {
   user: User | null;
@@ -55,7 +40,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Set the default user to Admin for demonstration purposes
   const [user, setUser] = useState<User | null>(mockAdmin);
-  const users = [mockAdmin, mockManager, mockCashier, mockSupport];
+  const users = [mockAdmin, mockCashier];
 
   return (
     <AuthContext.Provider value={{ user, setUser, users }}>

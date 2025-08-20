@@ -19,15 +19,25 @@ import {
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu";
 import { useAuth, ROLE } from "@/lib/auth";
+import { useToast } from "@/hooks/use-toast";
 
 export function UserNav() {
   const { user, setUser } = useAuth();
+  const { toast } = useToast();
 
   if (!user) return null;
 
   const handleRoleChange = (role: string) => {
-    if (Object.values(ROLE).includes(role as any)) {
-      setUser({ ...user, role: role as any });
+    if (role === ROLE.ADMIN) {
+      const password = prompt("Please enter the admin password:");
+      if (password === "KINGORCA") {
+        setUser({ ...user, role: ROLE.ADMIN });
+        toast({ title: "Success", description: "Switched to Admin role." });
+      } else {
+        toast({ variant: "destructive", title: "Error", description: "Incorrect password." });
+      }
+    } else if (role === ROLE.CASHIER) {
+      setUser({ ...user, role: ROLE.CASHIER });
     }
   };
 
@@ -54,9 +64,7 @@ export function UserNav() {
         <DropdownMenuRadioGroup value={user.role} onValueChange={handleRoleChange}>
           <DropdownMenuLabel>Switch Role (for demo)</DropdownMenuLabel>
           <DropdownMenuRadioItem value={ROLE.ADMIN}>Admin</DropdownMenuRadioItem>
-           <DropdownMenuRadioItem value={ROLE.MANAGER}>Manager</DropdownMenuRadioItem>
           <DropdownMenuRadioItem value={ROLE.CASHIER}>Cashier</DropdownMenuRadioItem>
-          <DropdownMenuRadioItem value={ROLE.SUPPORT_STAFF}>Support Staff</DropdownMenuRadioItem>
         </DropdownMenuRadioGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>

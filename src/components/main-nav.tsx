@@ -38,25 +38,25 @@ const allLinks = [
     href: "/inventory",
     label: "Inventory",
     icon: Beer,
-    allowedRoles: [ROLE.ADMIN, ROLE.MANAGER],
+    allowedRoles: [ROLE.ADMIN],
   },
   {
     href: "/employees",
     label: "Employees",
     icon: Users,
-    allowedRoles: [ROLE.ADMIN, ROLE.MANAGER],
+    allowedRoles: [ROLE.ADMIN],
   },
   {
     href: "/reports",
     label: "Reports",
     icon: BarChart3,
-    allowedRoles: [ROLE.ADMIN, ROLE.MANAGER],
+    allowedRoles: [ROLE.ADMIN],
   },
   {
     href: "/forecasting",
     label: "AI Forecasting",
     icon: BrainCircuit,
-    allowedRoles: [ROLE.ADMIN, ROLE.MANAGER],
+    allowedRoles: [ROLE.ADMIN],
   },
   {
     href: "/anomaly-detection",
@@ -68,7 +68,7 @@ const allLinks = [
     href: "/customer-support",
     label: "Customer Support",
     icon: MessageSquare,
-    allowedRoles: [ROLE.ADMIN, ROLE.SUPPORT_STAFF],
+    allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
   },
 ];
 

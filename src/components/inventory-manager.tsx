@@ -135,7 +135,7 @@ export function InventoryManager() {
   }
 
   const canEditPrices = user.role === ROLE.ADMIN;
-  const canDeleteItems = user.role === ROLE.ADMIN || user.role === ROLE.MANAGER;
+  const canDeleteItems = user.role === ROLE.ADMIN;
 
 
   return (
