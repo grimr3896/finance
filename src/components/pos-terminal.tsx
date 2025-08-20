@@ -73,6 +73,11 @@ export function PosTerminal() {
   const [mpesaCode, setMpesaCode] = useState("");
   const router = useRouter();
   const { toast } = useToast();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const scannedDrinkId = localStorage.getItem("scannedDrinkId");
@@ -190,6 +195,9 @@ export function PosTerminal() {
     return received - total;
   }, [cashReceived, total, paymentMethod]);
 
+  if (!isMounted) {
+    return null; // or a loading spinner
+  }
 
   return (
     <>
