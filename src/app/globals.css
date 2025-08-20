@@ -82,6 +82,10 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background-image: url('https://i.pinimg.com/originals/b2/5b/5a/b25b5a7a72c1537d9c6d73f49f3e4303.gif');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
   }
 }
 
