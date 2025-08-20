@@ -1,6 +1,7 @@
 
 import { ThemeCustomizer } from "@/components/theme-customizer";
 import type { Metadata } from 'next';
+import { CompanyInfoForm } from "@/components/company-info-form";
 
 export const metadata: Metadata = {
     title: "Settings - BarBuddy POS",
@@ -16,6 +17,7 @@ export default function SettingsPage({ handleThemeChange }: { handleThemeChange:
                 Customize the appearance and behavior of the application.
             </p>
         </div>
+        <CompanyInfoForm />
         <ThemeCustomizer handleThemeChange={handleThemeChange} />
     </div>
   );
