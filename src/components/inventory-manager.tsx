@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, useMemo } from "react";
@@ -54,6 +55,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useAuth, ROLE } from "@/lib/auth";
 
 
 const initialDrinks: Drink[] = [
@@ -72,6 +74,7 @@ export function InventoryManager() {
   const [drinks, setDrinks] = useState<Drink[]>(initialDrinks);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingDrink, setEditingDrink] = useState<Partial<Drink> | null>(null);
+  const { user } = useAuth();
 
   const handleAddNew = () => {
     setEditingDrink({});
@@ -126,6 +129,10 @@ export function InventoryManager() {
     }
     return { label: 'Well Stocked', color: 'bg-emerald-600 text-emerald-50' };
   };
+  
+  if (!user) {
+    return null; // Or a loading spinner
+  }
 
   return (
     <>
@@ -177,7 +184,7 @@ export function InventoryManager() {
                           <DropdownMenuSeparator />
                            <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()}>Delete</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()} disabled={user.role === ROLE.CASHIER}>Delete</DropdownMenuItem>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
@@ -242,7 +249,14 @@ export function InventoryManager() {
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="costPrice" className="text-right">Cost Price (Ksh)</Label>
-              <Input id="costPrice" type="number" value={editingDrink?.costPrice || ''} onChange={(e) => handleFieldChange('costPrice', +e.target.value)} className="col-span-3" />
+              <Input 
+                id="costPrice" 
+                type="number" 
+                value={editingDrink?.costPrice || ''} 
+                onChange={(e) => handleFieldChange('costPrice', +e.target.value)} 
+                className="col-span-3"
+                disabled={user.role === ROLE.CASHIER}
+              />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="sellingPrice" className="text-right">Selling Price (Ksh)</Label>
@@ -266,3 +280,5 @@ export function InventoryManager() {
     </>
   );
 }
+
+    
