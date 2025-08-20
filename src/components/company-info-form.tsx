@@ -15,17 +15,24 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
+import { useAuth } from "@/lib/auth";
 
 export function CompanyInfoForm() {
   const { toast } = useToast();
+  const { adminPassword, setAdminPassword, secondaryAdminPassword, setSecondaryAdminPassword } = useAuth();
+  
   const [companyName, setCompanyName] = useState("Galaxy Inn");
   const [companyEmail, setCompanyEmail] = useState("contact@galaxyinn.app");
   const [companyPhone, setCompanyPhone] = useState("0712 345 678");
   const [adminEmail, setAdminEmail] = useState("admin@barbuddy.app");
 
+  const [localAdminPassword, setLocalAdminPassword] = useState(adminPassword);
+  const [localSecondaryAdminPassword, setLocalSecondaryAdminPassword] = useState(secondaryAdminPassword);
+
+
   const handleSave = () => {
-    // In a real application, this would save the data to a database or configuration file.
-    // For this prototype, we'll just show a success notification.
+    setAdminPassword(localAdminPassword);
+    setSecondaryAdminPassword(localSecondaryAdminPassword);
     toast({
       title: "Settings Saved",
       description: "Company information has been updated.",
@@ -77,6 +84,30 @@ export function CompanyInfoForm() {
                 />
                 <p className="text-xs text-muted-foreground">
                     This is the authorized email for the Admin Command feature.
+                </p>
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="admin-password">Admin Password</Label>
+                <Input
+                id="admin-password"
+                type="password"
+                value={localAdminPassword}
+                onChange={(e) => setLocalAdminPassword(e.target.value)}
+                />
+                 <p className="text-xs text-muted-foreground">
+                    Password for switching to Admin role.
+                </p>
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="secondary-admin-password">Secondary Admin Password</Label>
+                <Input
+                id="secondary-admin-password"
+                type="password"
+                value={localSecondaryAdminPassword}
+                onChange={(e) => setLocalSecondaryAdminPassword(e.target.value)}
+                />
+                 <p className="text-xs text-muted-foreground">
+                    An alternative password for the Admin role.
                 </p>
             </div>
         </div>

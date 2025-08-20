@@ -33,7 +33,7 @@ import { useAuth, ROLE } from "@/lib/auth";
 import { useToast } from "@/hooks/use-toast";
 
 export function UserNav() {
-  const { user, setUser } = useAuth();
+  const { user, setUser, adminPassword, secondaryAdminPassword } = useAuth();
   const { toast } = useToast();
   const [isPasswordDialogOpen, setIsPasswordDialogOpen] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
@@ -49,7 +49,7 @@ export function UserNav() {
   };
 
   const handlePasswordSubmit = () => {
-    if (passwordInput === "KINGORCA") {
+    if (passwordInput === adminPassword || (secondaryAdminPassword && passwordInput === secondaryAdminPassword)) {
       setUser({ ...user, role: ROLE.ADMIN });
       toast({ title: "Success", description: "Switched to Admin role." });
     } else {

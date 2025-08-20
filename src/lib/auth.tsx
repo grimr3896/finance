@@ -33,6 +33,10 @@ interface AuthContextType {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   users: User[];
+  adminPassword: string;
+  setAdminPassword: (password: string) => void;
+  secondaryAdminPassword: string;
+  setSecondaryAdminPassword: (password: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -40,10 +44,12 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Set the default user to Admin for demonstration purposes
   const [user, setUser] = useState<User | null>(mockAdmin);
+  const [adminPassword, setAdminPassword] = useState("KINGORCA");
+  const [secondaryAdminPassword, setSecondaryAdminPassword] = useState("");
   const users = [mockAdmin, mockCashier];
 
   return (
-    <AuthContext.Provider value={{ user, setUser, users }}>
+    <AuthContext.Provider value={{ user, setUser, users, adminPassword, setAdminPassword, secondaryAdminPassword, setSecondaryAdminPassword }}>
       {children}
     </AuthContext.Provider>
   );
