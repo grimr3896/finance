@@ -55,7 +55,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <main className="flex-1 overflow-y-auto p-4 sm:p-6">
             {React.Children.map(children, child => {
                 if (React.isValidElement(child)) {
-                    return React.cloneElement(child, { handleThemeChange } as any);
+                    // @ts-ignore
+                    return React.cloneElement(child, { handleThemeChange });
                 }
                 return child;
             })}
