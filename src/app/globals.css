@@ -84,3 +84,24 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #receipt-dialog, #receipt-dialog * {
+    visibility: visible;
+  }
+  #receipt-dialog {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    max-width: 100%;
+    border: none;
+    box-shadow: none;
+  }
+  #receipt-content {
+     color: black; /* Ensure text is visible on white paper */
+  }
+}

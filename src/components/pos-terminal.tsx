@@ -172,6 +172,10 @@ export function PosTerminal() {
     })
   };
 
+  const handlePrint = () => {
+    window.print();
+  }
+
   const changeDue = useMemo(() => {
     if (paymentMethod !== 'Cash') return 0;
     const received = parseFloat(cashReceived);
@@ -382,14 +386,14 @@ export function PosTerminal() {
       </Dialog>
       
        <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
-        <DialogContent className="sm:max-w-sm">
+        <DialogContent className="sm:max-w-sm" id="receipt-dialog">
             <DialogHeader>
                 <DialogTitle className="font-headline text-primary">Transaction Receipt</DialogTitle>
             </DialogHeader>
             {lastSale && <Receipt sale={lastSale.sale} cashReceived={lastSale.cashReceived} changeDue={lastSale.changeDue} />}
             <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setIsReceiptOpen(false)}>Close</Button>
-                <Button type="button">Print</Button>
+                <Button type="button" onClick={handlePrint}>Print</Button>
             </DialogFooter>
         </DialogContent>
       </Dialog>
