@@ -199,17 +199,11 @@ export function PosTerminal() {
               {filteredDrinks.map((drink) => (
                 <Card
                   key={drink.id}
-                  className="overflow-hidden cursor-pointer group border-border/50 hover:border-primary transition-all duration-200 ease-in-out shadow-sm hover:shadow-lg hover:shadow-primary/20 bg-card"
+                  className="cursor-pointer group border-border/50 hover:border-primary transition-all duration-200 ease-in-out shadow-sm hover:shadow-lg hover:shadow-primary/20 bg-card flex items-center justify-center p-2"
                   onClick={() => addToCart(drink)}
                 >
-                  <div className="aspect-square relative overflow-hidden">
-                    {drink.image && (
-                      <Image src={drink.image} alt={drink.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" data-ai-hint="drink bottle" />
-                    )}
-                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  </div>
-                  <div className="p-2 text-center">
-                    <p className="text-sm font-medium text-foreground truncate">{drink.name}</p>
+                  <div className="text-center">
+                    <p className="text-sm font-medium text-foreground">{drink.name}</p>
                     <p className="text-xs text-primary font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
                   </div>
                 </Card>
