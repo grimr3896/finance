@@ -136,6 +136,7 @@ export function InventoryManager() {
 
   const canEditPrices = user.role === ROLE.ADMIN;
   const canDeleteItems = user.role === ROLE.ADMIN;
+  const isCashier = user.role === ROLE.CASHIER;
 
 
   return (
@@ -225,19 +226,19 @@ export function InventoryManager() {
           <div className="grid gap-4 py-4">
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">Name</Label>
-              <Input id="name" value={editingDrink?.name || ''} onChange={(e) => handleFieldChange('name', e.target.value)} className="col-span-3" />
+              <Input id="name" value={editingDrink?.name || ''} onChange={(e) => handleFieldChange('name', e.target.value)} className="col-span-3" disabled={isCashier} />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="barcode" className="text-right">Barcode</Label>
-              <Input id="barcode" value={editingDrink?.barcode || ''} onChange={(e) => handleFieldChange('barcode', e.target.value)} className="col-span-3" />
+              <Input id="barcode" value={editingDrink?.barcode || ''} onChange={(e) => handleFieldChange('barcode', e.target.value)} className="col-span-3" disabled={isCashier} />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="image" className="text-right">Image URL</Label>
-              <Input id="image" value={editingDrink?.image || ''} onChange={(e) => handleFieldChange('image', e.target.value)} className="col-span-3" />
+              <Input id="image" value={editingDrink?.image || ''} onChange={(e) => handleFieldChange('image', e.target.value)} className="col-span-3" disabled={isCashier} />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="unit" className="text-right">Unit</Label>
-              <Select value={editingDrink?.unit} onValueChange={(value) => handleFieldChange('unit', value)}>
+              <Select value={editingDrink?.unit} onValueChange={(value) => handleFieldChange('unit', value)} disabled={isCashier}>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select unit type" />
                 </SelectTrigger>
@@ -276,7 +277,7 @@ export function InventoryManager() {
              {editingDrink?.unit === 'ml' && (
                <div className="grid grid-cols-4 items-center gap-4">
                 <Label htmlFor="unitMl" className="text-right">Serving (ml)</Label>
-                <Input id="unitMl" type="number" value={editingDrink?.unitMl || ''} onChange={(e) => handleFieldChange('unitMl', +e.target.value)} className="col-span-3" />
+                <Input id="unitMl" type="number" value={editingDrink?.unitMl || ''} onChange={(e) => handleFieldChange('unitMl', +e.target.value)} className="col-span-3" disabled={isCashier} />
               </div>
             )}
           </div>
