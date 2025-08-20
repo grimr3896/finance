@@ -38,7 +38,7 @@ const allLinks = [
     href: "/inventory",
     label: "Inventory",
     icon: Beer,
-    allowedRoles: [ROLE.ADMIN],
+    allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
   },
   {
     href: "/employees",
