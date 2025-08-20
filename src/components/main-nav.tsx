@@ -14,6 +14,7 @@ import {
   MessageSquare,
   Settings,
   History,
+  Mail,
 } from "lucide-react";
 
 import {
@@ -70,6 +71,12 @@ const allLinks = [
     href: "/anomaly-detection",
     label: "Anomaly Detection",
     icon: ShieldAlert,
+    allowedRoles: [ROLE.ADMIN],
+  },
+  {
+    href: "/admin-command",
+    label: "Admin Command",
+    icon: Mail,
     allowedRoles: [ROLE.ADMIN],
   },
   {
