@@ -19,6 +19,13 @@ const nextConfig: NextConfig = {
     ],
   },
   serverComponentsExternalPackages: ['@opentelemetry/context-async-hooks'],
+  webpack: (config, { isServer }) => {
+    // Exclude async_hooks from client-side bundle
+    if (!isServer) {
+        config.externals = [...config.externals, 'async_hooks'];
+    }
+    return config;
+  }
 };
 
 export default nextConfig;
