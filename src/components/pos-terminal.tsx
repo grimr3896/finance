@@ -35,15 +35,16 @@ import { useToast } from "@/hooks/use-toast";
 import { Receipt } from "@/components/receipt";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 
 const availableDrinks: Drink[] = [
-    { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202', image: "https://placehold.co/150x150.png" },
-    { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 36, unit: 'bottle', barcode: '6161100110103', image: "https://placehold.co/150x150.png" },
-    { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301', image: "https://placehold.co/150x150.png" },
-    { id: "DRK004", name: "Draft Beer (250ml)", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0', image: "https://placehold.co/150x150.png" },
-    { id: "DRK005", name: "Drum (250ml)", costPrice: 180, sellingPrice: 220, stock: 100, unit: 'ml', unitMl: 250, barcode: '1', image: "https://placehold.co/150x150.png" },
-    { id: "DRK006", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 72, unit: 'bottle', barcode: '8712000030393', image: "https://placehold.co/150x150.png" },
-    { id: "DRK007", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202', image: "https://placehold.co/150x150.png" },
+    { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202' },
+    { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 36, unit: 'bottle', barcode: '6161100110103' },
+    { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301' },
+    { id: "DRK004", name: "Draft Beer (250ml)", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0' },
+    { id: "DRK005", name: "Drum (250ml)", costPrice: 180, sellingPrice: 220, stock: 100, unit: 'ml', unitMl: 250, barcode: '1' },
+    { id: "DRK006", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 72, unit: 'bottle', barcode: '8712000030393' },
+    { id: "DRK007", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202' },
 ];
 
 type CartItem = {
@@ -58,53 +59,20 @@ type CompletedSale = {
 }
 
 export function PosTerminal() {
-  const [cart, setCart] = useState<CartItem[]>(() => {
-    try {
-      const savedCart = localStorage.getItem("pos-cart");
-      return savedCart ? JSON.parse(savedCart) : [];
-    } catch (error) {
-      console.error("Failed to load cart from localStorage", error);
-      return [];
-    }
-  });
+  const [cart, setCart] = useLocalStorage<CartItem[]>("pos-cart", []);
+  const [salesHistory, setSalesHistory] = useLocalStorage<CompletedSale[]>("pos-sales-history", []);
+  
   const [searchTerm, setSearchTerm] = useState("");
   const [isCashoutOpen, setIsCashoutOpen] = useState(false);
   const [isReceiptOpen, setIsReceiptOpen] = useState(false);
   const [lastSale, setLastSale] = useState<CompletedSale | null>(null);
-  const [salesHistory, setSalesHistory] = useState<CompletedSale[]>(() => {
-     try {
-      const savedHistory = localStorage.getItem("pos-sales-history");
-      return savedHistory ? JSON.parse(savedHistory) : [];
-    } catch (error) {
-      console.error("Failed to load sales history from localStorage", error);
-      return [];
-    }
-  });
+  
   const [paymentMethod, setPaymentMethod] = useState<"Cash" | "Card" | "Mpesa" | null>(null);
   const [cashReceived, setCashReceived] = useState("");
   const [mpesaPhone, setMpesaPhone] = useState("");
   const [mpesaCode, setMpesaCode] = useState("");
   const router = useRouter();
   const { toast } = useToast();
-
-  useEffect(() => {
-    // Save cart to localStorage whenever it changes
-    try {
-        localStorage.setItem("pos-cart", JSON.stringify(cart));
-    } catch (error) {
-        console.error("Failed to save cart to localStorage", error);
-    }
-  }, [cart]);
-
-  useEffect(() => {
-    // Save sales history to localStorage whenever it changes
-    try {
-      localStorage.setItem("pos-sales-history", JSON.stringify(salesHistory));
-    } catch (error) {
-        console.error("Failed to save sales history to localStorage", error);
-    }
-  }, [salesHistory]);
-
 
   useEffect(() => {
     const scannedDrinkId = localStorage.getItem("scannedDrinkId");
@@ -253,6 +221,7 @@ export function PosTerminal() {
                   <div className="text-center">
                     <p className="text-sm font-medium text-foreground">{drink.name}</p>
                     <p className="text-xs text-primary font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
+                     <p className="text-xs text-emerald-500">Profit: Ksh {(drink.sellingPrice - drink.costPrice).toFixed(2)}</p>
                   </div>
                 </Card>
               ))}
