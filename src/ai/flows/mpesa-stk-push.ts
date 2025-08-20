@@ -4,25 +4,11 @@
  * @fileOverview A flow for initiating M-Pesa STK push payments.
  *
  * - requestMpesaPayment - A function that handles the M-Pesa STK push request.
- * - MpesaStkPushInput - The input type for the requestMpesaPayment function.
- * - MpesaStkPushOutput - The return type for the requestMpesaPayment function.
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
-
-export const MpesaStkPushInputSchema = z.object({
-  phoneNumber: z.string().describe("The customer's phone number in the format 254..."),
-  amount: z.number().describe('The amount to be paid.'),
-});
-export type MpesaStkPushInput = z.infer<typeof MpesaStkPushInputSchema>;
-
-export const MpesaStkPushOutputSchema = z.object({
-  success: z.boolean().describe('Whether the STK push was successfully initiated.'),
-  message: z.string().describe('A message indicating the status of the transaction.'),
-  mpesaReceiptNumber: z.string().optional().describe('The M-Pesa receipt number for the transaction.'),
-});
-export type MpesaStkPushOutput = z.infer<typeof MpesaStkPushOutputSchema>;
+import type { MpesaStkPushInput, MpesaStkPushOutput } from '@/ai/schemas/mpesa-schemas';
+import { MpesaStkPushInputSchema, MpesaStkPushOutputSchema } from '@/ai/schemas/mpesa-schemas';
 
 export async function requestMpesaPayment(
   input: MpesaStkPushInput
