@@ -215,13 +215,20 @@ export function PosTerminal() {
               {filteredDrinks.map((drink) => (
                 <Card
                   key={drink.id}
-                  className="cursor-pointer flex items-center justify-center p-2 bg-[#9d2953] hover:opacity-90 transition-opacity"
-                  onClick={() => addToCart(drink)}
+                  className="flex flex-col p-2 bg-[#9d2953] transition-opacity"
                 >
-                  <div className="text-center">
+                  <div className="flex-1 text-center">
                     <p className="text-sm font-medium text-white">{drink.name}</p>
                     <p className="text-xs text-black font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
                   </div>
+                   <Button 
+                     variant="outline"
+                     size="sm"
+                     className="mt-2 w-full bg-white/20 text-white hover:bg-white/30 border-white/50"
+                     onClick={() => addToCart(drink)}
+                    >
+                      Order
+                    </Button>
                 </Card>
               ))}
             </CardContent>
