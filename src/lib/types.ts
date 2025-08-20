@@ -8,6 +8,9 @@ export type Drink = {
   unitMl?: number; // e.g., 250 for a 250ml serving from a drum
   barcode?: string;
   image?: string;
+  sold: number;
+  required: number;
+  received: number;
 };
 
 export type Employee = {
@@ -36,7 +39,7 @@ export type Sale = {
 };
 
 export type Expense = {
-  id: string;
+  id:string;
   description: string;
   amount: number;
   date: string;

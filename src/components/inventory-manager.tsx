@@ -59,12 +59,12 @@ import { useAuth, ROLE } from "@/lib/auth";
 
 
 const initialDrinks: Drink[] = [
-  { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202', image: "https://placehold.co/150x150.png" },
-  { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 8, unit: 'bottle', barcode: '6161100110103', image: "https://placehold.co/150x150.png" },
-  { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301', image: "https://placehold.co/150x150.png" },
-  { id: "DRK004", name: "Draft Beer", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0', image: "https://placehold.co/150x150.png" },
-  { id: "DRK005", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 2, unit: 'bottle', barcode: '8712000030393', image: "https://placehold.co/150x150.png" },
-  { id: "DRK006", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202', image: "https://placehold.co/150x150.png" },
+  { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202', image: "https://placehold.co/150x150.png", sold: 12, required: 12, received: 0 },
+  { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 8, unit: 'bottle', barcode: '6161100110103', image: "https://placehold.co/150x150.png", sold: 5, required: 5, received: 0 },
+  { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301', image: "https://placehold.co/150x150.png", sold: 2, required: 2, received: 2},
+  { id: "DRK004", name: "Draft Beer", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0', image: "https://placehold.co/150x150.png", sold: 1000, required: 1000, received: 0 },
+  { id: "DRK005", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 2, unit: 'bottle', barcode: '8712000030393', image: "https://placehold.co/150x150.png", sold: 22, required: 22, received: 24 },
+  { id: "DRK006", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202', image: "https://placehold.co/150x150.png", sold: 0, required: 0, received: 0 },
 ];
 
 const LOW_STOCK_THRESHOLD = 10;
@@ -112,6 +112,25 @@ export function InventoryManager() {
       setEditingDrink(prev => ({ ...prev, [field]: value }));
     }
   }
+
+  const handleReceivedChange = (drinkId: string, value: number) => {
+    setDrinks(drinks.map(d => d.id === drinkId ? { ...d, received: value } : d));
+  }
+
+  const handleRestock = (drinkId: string) => {
+    setDrinks(drinks.map(d => {
+      if (d.id === drinkId) {
+        return {
+          ...d,
+          stock: d.stock + d.received,
+          sold: 0,
+          required: 0,
+          received: 0
+        };
+      }
+      return d;
+    }));
+  }
   
   const sortedDrinks = useMemo(() => {
     return [...drinks].sort((a, b) => a.name.localeCompare(b.name));
@@ -134,8 +153,6 @@ export function InventoryManager() {
     return null; // Or a loading spinner
   }
 
-  const canEditPrices = user.role === ROLE.ADMIN;
-  const canDeleteItems = user.role === ROLE.ADMIN;
   const isCashier = user.role === ROLE.CASHIER;
 
 
@@ -146,7 +163,7 @@ export function InventoryManager() {
           <h2 className="text-3xl font-headline font-bold tracking-tight">Inventory</h2>
           <p className="text-muted-foreground">Manage your bar's drink inventory.</p>
         </div>
-        <Button onClick={handleAddNew}>
+        <Button onClick={handleAddNew} disabled={isCashier}>
           <PlusCircle className="mr-2 h-4 w-4" /> Add New Drink
         </Button>
       </div>
@@ -158,13 +175,16 @@ export function InventoryManager() {
                 <TableHead>Name</TableHead>
                 <TableHead>Stock Level</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Selling Price</TableHead>
+                <TableHead>Sold Today</TableHead>
+                <TableHead>Required</TableHead>
+                <TableHead>Received</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {sortedDrinks.map((drink) => {
                 const status = getStockStatus(drink);
+                const variance = drink.required - drink.received;
                 return (
                   <TableRow key={drink.id}>
                     <TableCell className="font-medium">{drink.name}</TableCell>
@@ -175,8 +195,25 @@ export function InventoryManager() {
                     <TableCell>
                       <Badge className={cn("hover:bg-opacity-80", status.color)}>{status.label}</Badge>
                     </TableCell>
-                    <TableCell>Ksh {drink.sellingPrice.toFixed(2)}</TableCell>
-                    <TableCell className="text-right">
+                     <TableCell>{drink.sold}</TableCell>
+                    <TableCell>{drink.required}</TableCell>
+                    <TableCell>
+                       <div className="flex items-center gap-2">
+                        <Input 
+                          type="number" 
+                          className="h-8 w-20" 
+                          value={drink.received}
+                          onChange={(e) => handleReceivedChange(drink.id, parseInt(e.target.value) || 0)}
+                        />
+                         {variance !== 0 && (
+                          <Badge variant={variance > 0 ? "destructive" : "secondary"}>
+                            {variance > 0 ? `Short ${variance}` : `Over ${Math.abs(variance)}`}
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right flex justify-end items-center gap-2">
+                      <Button size="sm" onClick={() => handleRestock(drink.id)}>Restock</Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" className="h-8 w-8 p-0">
@@ -189,7 +226,7 @@ export function InventoryManager() {
                           <DropdownMenuSeparator />
                            <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()} disabled={!canDeleteItems}>Delete</DropdownMenuItem>
+                              <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()} disabled={isCashier}>Delete</DropdownMenuItem>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
@@ -260,7 +297,7 @@ export function InventoryManager() {
                 value={editingDrink?.costPrice || ''} 
                 onChange={(e) => handleFieldChange('costPrice', +e.target.value)} 
                 className="col-span-3"
-                disabled={!canEditPrices}
+                disabled={isCashier}
               />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
@@ -271,7 +308,7 @@ export function InventoryManager() {
                 value={editingDrink?.sellingPrice || ''} 
                 onChange={(e) => handleFieldChange('sellingPrice', +e.target.value)} 
                 className="col-span-3"
-                disabled={!canEditPrices}
+                disabled={isCashier}
               />
             </div>
              {editingDrink?.unit === 'ml' && (
