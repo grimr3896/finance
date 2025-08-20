@@ -13,6 +13,7 @@ import {
   ShoppingCart,
   MessageSquare,
   Settings,
+  History,
 } from "lucide-react";
 
 import {
@@ -39,6 +40,12 @@ const allLinks = [
     href: "/inventory",
     label: "Inventory",
     icon: Beer,
+    allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
+  },
+  {
+    href: "/order-history",
+    label: "Order History",
+    icon: History,
     allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
   },
   {
