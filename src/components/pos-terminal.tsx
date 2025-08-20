@@ -226,65 +226,67 @@ export function PosTerminal() {
                   <TabsTrigger value="history">Order History</TabsTrigger>
                 </TabsList>
               </CardHeader>
-              <TabsContent value="order" className="flex-1 overflow-y-auto p-2 m-0">
-                  {cart.length === 0 ? (
-                      <div className="flex h-full items-center justify-center">
-                          <p className="text-muted-foreground">Cart is empty</p>
-                      </div>
-                  ) : (
-                      <Table>
-                          <TableHeader>
-                              <TableRow>
-                                  <TableHead>Item</TableHead>
-                                  <TableHead className="w-[120px]">Qty</TableHead>
-                                  <TableHead className="text-right">Price</TableHead>
-                              </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                          {cart.map((item) => (
-                              <TableRow key={item.drink.id}>
-                              <TableCell className="font-medium">{item.drink.name}</TableCell>
-                              <TableCell>
-                                  <div className="flex items-center gap-1">
-                                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity - 1)}>
-                                          <MinusCircle className="h-4 w-4" />
-                                      </Button>
-                                      <span className="w-6 text-center">{item.quantity}</span>
-                                      <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity + 1)}>
-                                          <PlusCircle className="h-4 w-4" />
-                                      </Button>
-                                  </div>
-                              </TableCell>
-                              <TableCell className="text-right">
-                                  Ksh {(item.drink.sellingPrice * item.quantity).toFixed(2)}
-                              </TableCell>
-                              </TableRow>
-                          ))}
-                          </TableBody>
-                      </Table>
-                  )}
-              </TabsContent>
-               <TabsContent value="history" className="flex-1 overflow-y-auto m-0">
-                 <ScrollArea className="h-full px-4">
-                    {salesHistory.length === 0 ? (
-                      <div className="flex h-full items-center justify-center">
-                          <p className="text-muted-foreground">No sales yet</p>
-                      </div>
+              <div className="flex-1 overflow-y-auto">
+                <TabsContent value="order" className="m-0 p-2 h-full">
+                    {cart.length === 0 ? (
+                        <div className="flex h-full items-center justify-center">
+                            <p className="text-muted-foreground">Cart is empty</p>
+                        </div>
                     ) : (
-                      <div className="space-y-2">
-                        {salesHistory.map(({ sale }) => (
-                           <div key={sale.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-muted/50">
-                              <div>
-                                  <p className="font-mono text-xs">{sale.id}</p>
-                                  <p className="text-muted-foreground text-xs">{new Date(sale.timestamp).toLocaleTimeString()}</p>
-                              </div>
-                              <p className="font-semibold text-primary">Ksh {sale.total.toFixed(2)}</p>
-                          </div>
-                        ))}
-                      </div>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Item</TableHead>
+                                    <TableHead className="w-[120px]">Qty</TableHead>
+                                    <TableHead className="text-right">Price</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                            {cart.map((item) => (
+                                <TableRow key={item.drink.id}>
+                                <TableCell className="font-medium">{item.drink.name}</TableCell>
+                                <TableCell>
+                                    <div className="flex items-center gap-1">
+                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity - 1)}>
+                                            <MinusCircle className="h-4 w-4" />
+                                        </Button>
+                                        <span className="w-6 text-center">{item.quantity}</span>
+                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity + 1)}>
+                                            <PlusCircle className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                </TableCell>
+                                <TableCell className="text-right">
+                                    Ksh {(item.drink.sellingPrice * item.quantity).toFixed(2)}
+                                </TableCell>
+                                </TableRow>
+                            ))}
+                            </TableBody>
+                        </Table>
                     )}
-                 </ScrollArea>
-              </TabsContent>
+                </TabsContent>
+                <TabsContent value="history" className="m-0 h-full">
+                  <ScrollArea className="h-full px-4">
+                      {salesHistory.length === 0 ? (
+                        <div className="flex h-full items-center justify-center">
+                            <p className="text-muted-foreground">No sales yet</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          {salesHistory.map(({ sale }) => (
+                            <div key={sale.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-muted/50">
+                                <div>
+                                    <p className="font-mono text-xs">{sale.id}</p>
+                                    <p className="text-muted-foreground text-xs">{new Date(sale.timestamp).toLocaleTimeString()}</p>
+                                </div>
+                                <p className="font-semibold text-primary">Ksh {sale.total.toFixed(2)}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                  </ScrollArea>
+                </TabsContent>
+              </div>
               <CardFooter className="flex-col !p-4 border-t">
                 <div className="flex w-full justify-between text-2xl font-bold">
                     <span>Total</span>
