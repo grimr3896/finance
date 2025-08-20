@@ -20,30 +20,24 @@ import { Badge } from "@/components/ui/badge";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import type { Sale } from "@/lib/types";
 
-const recentSales: Sale[] = [
-    { id: "SALE001", items: [{ drinkName: 'Tusker', quantity: 2, price: 400}], total: 400, paymentMethod: 'Mpesa', cashier: 'John D.', timestamp: '2024-08-19 10:30 PM'},
-    { id: "SALE002", items: [{ drinkName: 'Drum (250ml)', quantity: 1, price: 220}], total: 220, paymentMethod: 'Cash', cashier: 'Jane S.', timestamp: '2024-08-19 10:25 PM'},
-    { id: "SALE003", items: [{ drinkName: 'Guinness', quantity: 1, price: 250}], total: 250, paymentMethod: 'Mpesa', cashier: 'John D.', timestamp: '2024-08-19 10:15 PM'},
-    { id: "SALE004", items: [{ drinkName: 'White Cap', quantity: 4, price: 800}], total: 800, paymentMethod: 'Cash', cashier: 'Jane S.', timestamp: '2024-08-19 10:05 PM'},
-    { id: "SALE005", items: [{ drinkName: 'Tusker', quantity: 1, price: 200}], total: 200, paymentMethod: 'Cash', cashier: 'John D.', timestamp: '2024-08-19 09:50 PM'},
-];
+const recentSales: Sale[] = [];
 
 
 export default function DashboardPage() {
   const [salesData, setSalesData] = useState<any[]>([]);
 
   useEffect(() => {
-    // Generate random sales data for the chart
-    const generateSalesData = () => [
-      { name: "Mon", total: Math.floor(Math.random() * 20000) + 10000 },
-      { name: "Tue", total: Math.floor(Math.random() * 20000) + 10000 },
-      { name: "Wed", total: Math.floor(Math.random() * 20000) + 10000 },
-      { name: "Thu", total: Math.floor(Math.random() * 20000) + 10000 },
-      { name: "Fri", total: Math.floor(Math.random() * 20000) + 10000 },
-      { name: "Sat", total: Math.floor(Math.random() * 20000) + 10000 },
-      { name: "Sun", total: Math.floor(Math.random() * 20000) + 10000 },
+    // In a real app, you would fetch this data from your backend
+    const initialSalesData = [
+      { name: "Mon", total: 0 },
+      { name: "Tue", total: 0 },
+      { name: "Wed", total: 0 },
+      { name: "Thu", total: 0 },
+      { name: "Fri", total: 0 },
+      { name: "Sat", total: 0 },
+      { name: "Sun", total: 0 },
     ];
-    setSalesData(generateSalesData());
+    setSalesData(initialSalesData);
   }, []);
 
 
@@ -56,8 +50,8 @@ export default function DashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Ksh 452,231.89</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <div className="text-2xl font-bold">Ksh 0.00</div>
+            <p className="text-xs text-muted-foreground">No sales data yet</p>
           </CardContent>
         </Card>
         <Card>
@@ -66,8 +60,8 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
-            <p className="text-xs text-muted-foreground">2 Clocked in</p>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-muted-foreground">0 Clocked in</p>
           </CardContent>
         </Card>
         <Card>
@@ -76,8 +70,8 @@ export default function DashboardPage() {
             <Beer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Tusker</div>
-            <p className="text-xs text-muted-foreground">+120 units today</p>
+            <div className="text-2xl font-bold">N/A</div>
+            <p className="text-xs text-muted-foreground">0 units today</p>
           </CardContent>
         </Card>
         <Card>
@@ -86,8 +80,8 @@ export default function DashboardPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">+1,234</div>
-            <p className="text-xs text-muted-foreground">+15% from yesterday</p>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-muted-foreground">No sales data yet</p>
           </CardContent>
         </Card>
       </div>
@@ -144,20 +138,28 @@ export default function DashboardPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentSales.map((sale) => (
-                  <TableRow key={sale.id}>
-                    <TableCell>
-                      <div className="font-medium">{sale.cashier}</div>
-                      <div className="text-sm text-muted-foreground">{sale.items[0].drinkName}</div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={sale.paymentMethod === 'Cash' ? 'secondary' : 'outline'}>
-                        {sale.paymentMethod}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">Ksh {sale.total.toFixed(2)}</TableCell>
-                  </TableRow>
-                ))}
+                {recentSales.length > 0 ? (
+                    recentSales.map((sale) => (
+                      <TableRow key={sale.id}>
+                        <TableCell>
+                          <div className="font-medium">{sale.cashier}</div>
+                          <div className="text-sm text-muted-foreground">{sale.items[0].drinkName}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={sale.paymentMethod === 'Cash' ? 'secondary' : 'outline'}>
+                            {sale.paymentMethod}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-right">Ksh {sale.total.toFixed(2)}</TableCell>
+                      </TableRow>
+                    ))
+                ) : (
+                    <TableRow>
+                        <TableCell colSpan={3} className="text-center text-muted-foreground">
+                            No recent sales
+                        </TableCell>
+                    </TableRow>
+                )}
               </TableBody>
             </Table>
           </CardContent>

@@ -37,15 +37,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 
-const availableDrinks: Drink[] = [
-    { id: "DRK001", name: "Tusker", costPrice: 150, sellingPrice: 200, stock: 48, unit: 'bottle', barcode: '6161101410202' },
-    { id: "DRK002", name: "Guinness", costPrice: 180, sellingPrice: 250, stock: 36, unit: 'bottle', barcode: '6161100110103' },
-    { id: "DRK003", name: "White Cap", costPrice: 160, sellingPrice: 200, stock: 60, unit: 'bottle', barcode: '6161100110301' },
-    { id: "DRK004", name: "Draft Beer (250ml)", costPrice: 40000/200, sellingPrice: 220, stock: 35000, unit: 'ml', unitMl: 250, barcode: '0' },
-    { id: "DRK005", name: "Drum (250ml)", costPrice: 180, sellingPrice: 220, stock: 100, unit: 'ml', unitMl: 250, barcode: '1' },
-    { id: "DRK006", name: "Heineken", costPrice: 170, sellingPrice: 230, stock: 72, unit: 'bottle', barcode: '8712000030393' },
-    { id: "DRK007", name: "Pilsner", costPrice: 140, sellingPrice: 190, stock: 80, unit: 'bottle', barcode: '6161100110202' },
-];
+const availableDrinks: Drink[] = [];
 
 type CartItem = {
     drink: Drink;
@@ -224,25 +216,31 @@ export function PosTerminal() {
                   </div>
               </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-1 overflow-y-auto p-4">
-              {filteredDrinks.map((drink) => (
-                <Card
-                  key={drink.id}
-                  className="flex flex-col p-2 bg-[#800020] transition-opacity"
-                >
-                  <div className="flex-1 text-center">
-                    <p className="text-sm font-medium text-white">{drink.name}</p>
-                    <p className="text-xs text-black font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
-                  </div>
-                   <Button 
-                     variant="outline"
-                     size="sm"
-                     className="mt-2 w-full bg-white/20 text-white hover:bg-white/30 border-white/50"
-                     onClick={() => addToCart(drink)}
+              {filteredDrinks.length > 0 ? (
+                filteredDrinks.map((drink) => (
+                    <Card
+                    key={drink.id}
+                    className="flex flex-col p-2 bg-[#800020] transition-opacity"
                     >
-                      Order
-                    </Button>
-                </Card>
-              ))}
+                    <div className="flex-1 text-center">
+                        <p className="text-sm font-medium text-white">{drink.name}</p>
+                        <p className="text-xs text-black font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
+                    </div>
+                    <Button 
+                        variant="outline"
+                        size="sm"
+                        className="mt-2 w-full bg-white/20 text-white hover:bg-white/30 border-white/50"
+                        onClick={() => addToCart(drink)}
+                        >
+                        Order
+                        </Button>
+                    </Card>
+                ))
+              ) : (
+                <div className="col-span-full flex items-center justify-center text-muted-foreground">
+                    No drinks in inventory. Please add items on the Inventory page.
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>

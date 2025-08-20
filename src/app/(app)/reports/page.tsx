@@ -23,20 +23,8 @@ import {
 } from "@/components/ui/table";
 import { Download } from "lucide-react";
 
-const expenses = [
-  { id: 'EXP001', description: 'Stock Purchase - Tusker Crates', amount: 15000, date: '2024-08-19' },
-  { id: 'EXP002', description: 'Staff Salaries - July', amount: 80000, date: '2024-08-15' },
-  { id: 'EXP003', description: 'Utilities - Electricity Bill', amount: 5500, date: '2024-08-10' },
-  { id: 'EXP004', description: 'Stock Purchase - Draft Beer Drum', amount: 40000, date: '2024-08-05' },
-];
-
-const salesByItem = [
-    { name: 'Tusker', quantitySold: 120, revenue: 24000, cost: 18000, profit: 6000 },
-    { name: 'Guinness', quantitySold: 80, revenue: 20000, cost: 14400, profit: 5600 },
-    { name: 'White Cap', quantitySold: 95, revenue: 19000, cost: 15200, profit: 3800 },
-    { name: 'Heineken', quantitySold: 60, revenue: 13800, cost: 10200, profit: 3600 },
-    { name: 'Draft Beer (250ml)', quantitySold: 150, revenue: 33000, cost: 30000, profit: 3000 },
-];
+const expenses: any[] = [];
+const salesByItem: any[] = [];
 
 export default function ReportsPage() {
   return (
@@ -66,7 +54,7 @@ export default function ReportsPage() {
                 <CardTitle className="text-sm font-medium">Total Sales</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">Ksh 42,250.50</div>
+                <div className="text-2xl font-bold">Ksh 0.00</div>
               </CardContent>
             </Card>
              <Card>
@@ -74,7 +62,7 @@ export default function ReportsPage() {
                 <CardTitle className="text-sm font-medium">Total Expenses</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">Ksh 12,000.00</div>
+                <div className="text-2xl font-bold">Ksh 0.00</div>
               </CardContent>
             </Card>
              <Card>
@@ -82,7 +70,7 @@ export default function ReportsPage() {
                 <CardTitle className="text-sm font-medium">Profit</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold text-emerald-500">Ksh 30,250.50</div>
+                <div className="text-2xl font-bold text-emerald-500">Ksh 0.00</div>
               </CardContent>
             </Card>
              <Card>
@@ -90,7 +78,7 @@ export default function ReportsPage() {
                 <CardTitle className="text-sm font-medium">Best Seller</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">Tusker</div>
+                <div className="text-2xl font-bold">N/A</div>
               </CardContent>
             </Card>
           </div>
@@ -110,14 +98,22 @@ export default function ReportsPage() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {salesByItem.map(item => (
-                                <TableRow key={item.name}>
-                                    <TableCell>{item.name}</TableCell>
-                                    <TableCell>{item.quantitySold}</TableCell>
-                                    <TableCell>Ksh {item.revenue.toFixed(2)}</TableCell>
-                                    <TableCell className="text-right font-medium text-emerald-500">Ksh {item.profit.toFixed(2)}</TableCell>
+                            {salesByItem.length > 0 ? (
+                                salesByItem.map(item => (
+                                    <TableRow key={item.name}>
+                                        <TableCell>{item.name}</TableCell>
+                                        <TableCell>{item.quantitySold}</TableCell>
+                                        <TableCell>Ksh {item.revenue.toFixed(2)}</TableCell>
+                                        <TableCell className="text-right font-medium text-emerald-500">Ksh {item.profit.toFixed(2)}</TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={4} className="text-center text-muted-foreground">
+                                        No sales data available.
+                                    </TableCell>
                                 </TableRow>
-                            ))}
+                            )}
                         </TableBody>
                     </Table>
                 </CardContent>
@@ -136,13 +132,21 @@ export default function ReportsPage() {
                           </TableRow>
                       </TableHeader>
                       <TableBody>
-                          {expenses.map(expense => (
-                              <TableRow key={expense.id}>
-                                  <TableCell>{expense.date}</TableCell>
-                                  <TableCell>{expense.description}</TableCell>
-                                  <TableCell className="text-right">Ksh {expense.amount.toFixed(2)}</TableCell>
-                              </TableRow>
-                          ))}
+                          {expenses.length > 0 ? (
+                            expenses.map(expense => (
+                                <TableRow key={expense.id}>
+                                    <TableCell>{expense.date}</TableCell>
+                                    <TableCell>{expense.description}</TableCell>
+                                    <TableCell className="text-right">Ksh {expense.amount.toFixed(2)}</TableCell>
+                                </TableRow>
+                            ))
+                          ) : (
+                            <TableRow>
+                                <TableCell colSpan={3} className="text-center text-muted-foreground">
+                                    No expenses recorded.
+                                </TableCell>
+                            </TableRow>
+                          )}
                       </TableBody>
                   </Table>
               </CardContent>

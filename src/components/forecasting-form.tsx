@@ -67,12 +67,7 @@ export function ForecastingForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      historicalSalesData: "date,total\n" + Array.from({ length: 20 }, (_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - i -1);
-        const total = Math.floor(Math.random() * 50000) + 20000;
-        return `${d.toISOString().slice(0, 10)},${total}`;
-      }).join("\n"),
+      historicalSalesData: "date,total\n",
       horizonDays: 14,
     },
   });

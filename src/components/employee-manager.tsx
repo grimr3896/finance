@@ -49,10 +49,7 @@ import type { Employee } from "@/lib/types";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
-const initialEmployees: Employee[] = [
-  { id: "EMP001", name: "John Doe", role: "Admin", status: "Clocked In", email: "john.doe@example.com", phone: "0712345678", dateJoined: "2023-01-15" },
-  { id: "EMP003", name: "Peter Jones", role: "Cashier", status: "Clocked In", email: "peter.jones@example.com", phone: "0734567890", dateJoined: "2023-08-01" },
-];
+const initialEmployees: Employee[] = [];
 
 export function EmployeeManager() {
   const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
@@ -117,37 +114,45 @@ export function EmployeeManager() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {employees.map((employee) => (
-                <TableRow key={employee.id}>
-                  <TableCell className="font-medium">{employee.name}</TableCell>
-                  <TableCell>{employee.role}</TableCell>
-                   <TableCell>
-                      <div className="text-sm">{employee.email}</div>
-                      <div className="text-xs text-muted-foreground">{employee.phone}</div>
+              {employees.length > 0 ? (
+                employees.map((employee) => (
+                  <TableRow key={employee.id}>
+                    <TableCell className="font-medium">{employee.name}</TableCell>
+                    <TableCell>{employee.role}</TableCell>
+                     <TableCell>
+                        <div className="text-sm">{employee.email}</div>
+                        <div className="text-xs text-muted-foreground">{employee.phone}</div>
+                      </TableCell>
+                    <TableCell>{format(new Date(employee.dateJoined), "PPP")}</TableCell>
+                    <TableCell>
+                      <Badge variant={'default'} className={getStatusBadgeVariant(employee.status)}>
+                        {employee.status}
+                      </Badge>
                     </TableCell>
-                  <TableCell>{format(new Date(employee.dateJoined), "PPP")}</TableCell>
-                  <TableCell>
-                    <Badge variant={'default'} className={getStatusBadgeVariant(employee.status)}>
-                      {employee.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Open menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => toggleClockStatus(employee.id)}>Toggle Clock Status</DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEdit(employee)}>Edit</DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => toggleClockStatus(employee.id)}>Toggle Clock Status</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(employee)}>Edit</DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                    <TableCell colSpan={6} className="text-center text-muted-foreground">
+                        No employees found.
+                    </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>
