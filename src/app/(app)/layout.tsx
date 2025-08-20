@@ -1,3 +1,6 @@
+
+"use client";
+import React from "react";
 import { AuthProvider } from "@/lib/auth";
 import { Logo } from "@/components/icons";
 import { MainNav } from "@/components/main-nav";
@@ -10,8 +13,21 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { useState, useEffect } from "react";
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
+  const [theme, setTheme] = useState({ primary: "45 96% 51%", accent: "347 77% 49%" });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--primary", theme.primary);
+    root.style.setProperty("--accent", theme.accent);
+  }, [theme]);
+
+  const handleThemeChange = (newTheme: { primary: string; accent: string }) => {
+    setTheme(newTheme);
+  };
+
   return (
     <AuthProvider>
       <SidebarProvider>
@@ -35,7 +51,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <UserNav />
           </header>
           <main className="flex-1 overflow-y-auto p-4 sm:p-6">
-            {children}
+            {React.cloneElement(children as React.ReactElement, { handleThemeChange })}
           </main>
         </SidebarInset>
       </SidebarProvider>

@@ -12,6 +12,7 @@ import {
   ShieldAlert,
   ShoppingCart,
   MessageSquare,
+  Settings,
 } from "lucide-react";
 
 import {
@@ -69,6 +70,12 @@ const allLinks = [
     label: "Customer Support",
     icon: MessageSquare,
     allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
+  },
+    {
+    href: "/settings",
+    label: "Settings",
+    icon: Settings,
+    allowedRoles: [ROLE.ADMIN],
   },
 ];
 
