@@ -214,7 +214,6 @@ export function PosTerminal() {
                   <div className="text-center">
                     <p className="text-sm font-medium text-foreground">{drink.name}</p>
                     <p className="text-xs text-primary font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
-                    <p className="text-xs text-emerald-500 font-medium">Profit: Ksh {(drink.sellingPrice - drink.costPrice).toFixed(2)}</p>
                   </div>
                 </Card>
               ))}

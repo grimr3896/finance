@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,7 +28,15 @@ const expenses = [
   { id: 'EXP002', description: 'Staff Salaries - July', amount: 80000, date: '2024-08-15' },
   { id: 'EXP003', description: 'Utilities - Electricity Bill', amount: 5500, date: '2024-08-10' },
   { id: 'EXP004', description: 'Stock Purchase - Draft Beer Drum', amount: 40000, date: '2024-08-05' },
-]
+];
+
+const salesByItem = [
+    { name: 'Tusker', quantitySold: 120, revenue: 24000, cost: 18000, profit: 6000 },
+    { name: 'Guinness', quantitySold: 80, revenue: 20000, cost: 14400, profit: 5600 },
+    { name: 'White Cap', quantitySold: 95, revenue: 19000, cost: 15200, profit: 3800 },
+    { name: 'Heineken', quantitySold: 60, revenue: 13800, cost: 10200, profit: 3600 },
+    { name: 'Draft Beer (250ml)', quantitySold: 150, revenue: 33000, cost: 30000, profit: 3000 },
+];
 
 export default function ReportsPage() {
   return (
@@ -85,31 +94,60 @@ export default function ReportsPage() {
               </CardContent>
             </Card>
           </div>
-          <Card>
-            <CardHeader>
-                <CardTitle className="font-headline">Recent Expenses</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Description</TableHead>
-                            <TableHead className="text-right">Amount</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {expenses.map(expense => (
-                            <TableRow key={expense.id}>
-                                <TableCell>{expense.date}</TableCell>
-                                <TableCell>{expense.description}</TableCell>
-                                <TableCell className="text-right">Ksh {expense.amount.toFixed(2)}</TableCell>
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+                <CardHeader>
+                    <CardTitle className="font-headline">Sales & Profit by Item</CardTitle>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Item</TableHead>
+                                <TableHead>Qty Sold</TableHead>
+                                <TableHead>Revenue</TableHead>
+                                <TableHead className="text-right">Profit</TableHead>
                             </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </CardContent>
-          </Card>
+                        </TableHeader>
+                        <TableBody>
+                            {salesByItem.map(item => (
+                                <TableRow key={item.name}>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.quantitySold}</TableCell>
+                                    <TableCell>Ksh {item.revenue.toFixed(2)}</TableCell>
+                                    <TableCell className="text-right font-medium text-emerald-500">Ksh {item.profit.toFixed(2)}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                  <CardTitle className="font-headline">Recent Expenses</CardTitle>
+              </CardHeader>
+              <CardContent>
+                  <Table>
+                      <TableHeader>
+                          <TableRow>
+                              <TableHead>Date</TableHead>
+                              <TableHead>Description</TableHead>
+                              <TableHead className="text-right">Amount</TableHead>
+                          </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                          {expenses.map(expense => (
+                              <TableRow key={expense.id}>
+                                  <TableCell>{expense.date}</TableCell>
+                                  <TableCell>{expense.description}</TableCell>
+                                  <TableCell className="text-right">Ksh {expense.amount.toFixed(2)}</TableCell>
+                              </TableRow>
+                          ))}
+                      </TableBody>
+                  </Table>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
       </Tabs>
     </div>
