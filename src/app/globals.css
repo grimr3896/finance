@@ -82,7 +82,7 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
-    background-image: url('https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3N2eWdwN2J2Z2ZkYm16eWd6cDQ5Zmd2bm13Z3ZwbG45MXVzYnJ2ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/kFgzrTtSoL0VER2a3v/giphy.gif');
+    background-image: url('https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNTM5Z2p5d2V2aWZlemNqaGlnbzdva3Bua3FwOGp5b2p2dTk3bzh1aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/U3qYN8S0j3piM/giphy.gif');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;

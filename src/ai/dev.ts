@@ -5,4 +5,3 @@ import '@/ai/flows/predictive-sales-forecasting.ts';
 import '@/ai/flows/anomaly-detection.ts';
 import '@/ai/flows/customer-support-flow.ts';
 import '@/ai/flows/mpesa-stk-push.ts';
-import '@/ai/flows/admin-command-flow.ts';
