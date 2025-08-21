@@ -27,21 +27,11 @@ export default function DashboardPage() {
   const [sales] = useLocalStorage<Sale[]>("pos-sales-history", []);
   const [salesData, setSalesData] = useState<any[]>([]);
   const { user } = useAuth();
-  
-  const totalRevenue = sales.reduce((sum, sale) => sum + (sale.total || 0), 0);
-  const totalSalesToday = sales.filter(sale => new Date(sale.timestamp).toDateString() === new Date().toDateString()).length;
-  
-  const topSeller = sales.flatMap(s => s.items || [])
-    .reduce((acc, item) => {
-        if (item && item.drinkName) {
-            acc[item.drinkName] = (acc[item.drinkName] || 0) + item.quantity;
-        }
-        return acc;
-    }, {} as {[key: string]: number});
+  const [isClient, setIsClient] = useState(false);
 
-  const topSellerName = Object.keys(topSeller).length > 0 ? Object.entries(topSeller).sort((a,b) => b[1] - a[1])[0][0] : "N/A";
-  const topSellerUnits = Object.keys(topSeller).length > 0 ? Object.entries(topSeller).sort((a,b) => b[1] - a[1])[0][1] : 0;
-
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     // In a real app, you would fetch this data from your backend
@@ -56,6 +46,24 @@ export default function DashboardPage() {
     ];
     setSalesData(initialSalesData);
   }, []);
+  
+  if (!isClient) {
+    return null; // or a loading skeleton
+  }
+
+  const totalRevenue = sales.reduce((sum, sale) => sum + (sale.total || 0), 0);
+  const totalSalesToday = sales.filter(sale => new Date(sale.timestamp).toDateString() === new Date().toDateString()).length;
+  
+  const topSeller = sales.flatMap(s => s.items || [])
+    .reduce((acc, item) => {
+        if (item && item.drinkName) {
+            acc[item.drinkName] = (acc[item.drinkName] || 0) + item.quantity;
+        }
+        return acc;
+    }, {} as {[key: string]: number});
+
+  const topSellerName = Object.keys(topSeller).length > 0 ? Object.entries(topSeller).sort((a,b) => b[1] - a[1])[0][0] : "N/A";
+  const topSellerUnits = Object.keys(topSeller).length > 0 ? Object.entries(topSeller).sort((a,b) => b[1] - a[1])[0][1] : 0;
 
   const recentSales = sales.slice(0, 5);
 
