@@ -173,7 +173,7 @@ export default function DashboardPage() {
                       </TableRow>
                     ))
                 ) : (
-                    <TableRow>
+                    <TableRow key="no-sales">
                         <TableCell colSpan={3} className="text-center text-muted-foreground">
                             No recent sales
                         </TableCell>
