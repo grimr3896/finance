@@ -158,8 +158,8 @@ export default function DashboardPage() {
               </TableHeader>
               <TableBody>
                 {recentSales.length > 0 ? (
-                    recentSales.map((sale) => (
-                      <TableRow key={sale.id}>
+                    recentSales.map((sale, index) => (
+                      <TableRow key={sale.id || index}>
                         <TableCell>
                           <div className="font-medium">{sale.cashier}</div>
                           <div className="text-sm text-muted-foreground">{sale.items?.[0]?.drinkName || 'N/A'}</div>

@@ -19,13 +19,16 @@ export type User = {
   dateJoined: string; // ISO 8601 format
 };
 
-export type Sale = {
-  id: string;
-  items: {
+export type SaleItem = {
+    id?: string; // Optional ID for the sale item itself
     drinkName: string;
     quantity: number;
     price: number;
-  }[];
+}
+
+export type Sale = {
+  id: string;
+  items: SaleItem[];
   total: number;
   paymentMethod: 'Cash' | 'Mpesa' | 'Card';
   cashier: string;

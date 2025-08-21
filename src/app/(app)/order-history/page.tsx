@@ -56,12 +56,14 @@ export default function OrderHistoryPage() {
                 </TableHeader>
                 <TableBody>
                     {sales.length > 0 ? (
-                        sales.map(sale => (
-                            <TableRow key={sale.id}>
+                        sales.map((sale, index) => (
+                            <TableRow key={sale.id || index}>
                                 <TableCell className="font-mono text-xs">{formatDate(sale.timestamp)}</TableCell>
                                 <TableCell>{sale.cashier}</TableCell>
                                 <TableCell>
-                                    {sale.items.map(item => `${item.drinkName} (x${item.quantity})`).join(', ')}
+                                    {sale.items?.map((item, idx) => (
+                                        <div key={item.id || idx}>{item.drinkName} (x{item.quantity})</div>
+                                    ))}
                                 </TableCell>
                                  <TableCell>
                                     <Badge variant={sale.paymentMethod === 'Cash' ? 'secondary' : 'outline'}>
