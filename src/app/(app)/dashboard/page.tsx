@@ -31,7 +31,7 @@ export default function DashboardPage() {
   const totalRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
   const totalSalesToday = sales.filter(sale => new Date(sale.timestamp).toDateString() === new Date().toDateString()).length;
   
-  const topSeller = sales.flatMap(s => s.items || []) // Add a fallback for empty items
+  const topSeller = sales.flatMap(s => s.items || [])
     .reduce((acc, item) => {
         acc[item.drinkName] = (acc[item.drinkName] || 0) + item.quantity;
         return acc;
@@ -160,7 +160,7 @@ export default function DashboardPage() {
                       <TableRow key={sale.id}>
                         <TableCell>
                           <div className="font-medium">{sale.cashier}</div>
-                          <div className="text-sm text-muted-foreground">{sale.items[0]?.drinkName || 'N/A'}</div>
+                          <div className="text-sm text-muted-foreground">{sale.items?.[0]?.drinkName || 'N/A'}</div>
                         </TableCell>
                         <TableCell>
                           <Badge variant={sale.paymentMethod === 'Cash' ? 'secondary' : 'outline'}>
