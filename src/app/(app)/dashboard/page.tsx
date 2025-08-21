@@ -28,12 +28,14 @@ export default function DashboardPage() {
   const [salesData, setSalesData] = useState<any[]>([]);
   const { user } = useAuth();
   
-  const totalRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
+  const totalRevenue = sales.reduce((sum, sale) => sum + (sale.total || 0), 0);
   const totalSalesToday = sales.filter(sale => new Date(sale.timestamp).toDateString() === new Date().toDateString()).length;
   
   const topSeller = sales.flatMap(s => s.items || [])
     .reduce((acc, item) => {
-        acc[item.drinkName] = (acc[item.drinkName] || 0) + item.quantity;
+        if (item && item.drinkName) {
+            acc[item.drinkName] = (acc[item.drinkName] || 0) + item.quantity;
+        }
         return acc;
     }, {} as {[key: string]: number});
 
@@ -167,7 +169,7 @@ export default function DashboardPage() {
                             {sale.paymentMethod}
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-right">Ksh {sale.total.toFixed(2)}</TableCell>
+                        <TableCell className="text-right">Ksh {(sale.total || 0).toFixed(2)}</TableCell>
                       </TableRow>
                     ))
                 ) : (
