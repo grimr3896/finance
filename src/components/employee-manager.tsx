@@ -21,6 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,73 +32,72 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { PlusCircle, MoreHorizontal, CalendarIcon } from "lucide-react";
+import { PlusCircle, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import type { Employee } from "@/lib/types";
+import type { User } from "@/lib/types";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
+import { useAuth, ROLE } from "@/lib/auth";
 
-const initialEmployees: Employee[] = [];
+const initialUsers: User[] = [];
 
 export function EmployeeManager() {
-  const [employees, setEmployees] = useState<Employee[]>(initialEmployees);
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingEmployee, setEditingEmployee] = useState<Partial<Employee> | null>(null);
-  const [date, setDate] = useState<Date>()
+  const [editingUser, setEditingUser] = useState<Partial<User> | null>(null);
+  const { user: currentUser } = useAuth();
 
   const handleAddNew = () => {
-    setEditingEmployee({});
+    setEditingUser({ dateJoined: new Date().toISOString() });
     setIsDialogOpen(true);
   };
   
-  const handleEdit = (employee: Employee) => {
-    setEditingEmployee(employee);
-    setDate(new Date(employee.dateJoined));
+  const handleEdit = (user: User) => {
+    setEditingUser(user);
     setIsDialogOpen(true);
+  };
+
+  const handleDelete = (id: string) => {
+    setUsers(users.filter(user => user.id !== id));
   };
 
   const handleSave = () => {
-    // In a real app, you would handle form submission logic here
-    setIsDialogOpen(false);
-    setEditingEmployee(null);
-  };
-
-  const toggleClockStatus = (id: string) => {
-    setEmployees(employees.map(emp => 
-        emp.id === id ? { ...emp, status: emp.status === 'Clocked In' ? 'Clocked Out' : 'Clocked In' } : emp
-    ));
-  };
-  
-  const getStatusBadgeVariant = (status: Employee['status']) => {
-    switch (status) {
-      case 'Clocked In': return 'bg-emerald-600 text-emerald-50 hover:bg-emerald-600/80';
-      case 'On Leave': return 'bg-blue-500 text-blue-50 hover:bg-blue-500/80';
-      default: return 'secondary';
+    if (!editingUser) return;
+    if (editingUser.id) {
+        setUsers(users.map(u => u.id === editingUser.id ? editingUser as User : u));
+    } else {
+        const newUser: User = {
+            id: `USR${Date.now()}`,
+            ...editingUser
+        } as User;
+        setUsers([...users, newUser]);
     }
-  }
+    setIsDialogOpen(false);
+    setEditingUser(null);
+  };
 
+  if (!currentUser || currentUser.role !== ROLE.ADMIN) {
+    return (
+        <div>
+            <h2 className="text-3xl font-headline font-bold tracking-tight">Access Denied</h2>
+            <p className="text-muted-foreground">You do not have permission to manage users.</p>
+        </div>
+    );
+  }
 
   return (
     <>
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-headline font-bold tracking-tight">Employees</h2>
-          <p className="text-muted-foreground">Manage your staff and track attendance.</p>
+          <h2 className="text-3xl font-headline font-bold tracking-tight">User Management</h2>
+          <p className="text-muted-foreground">Manage your staff accounts.</p>
         </div>
         <Button onClick={handleAddNew}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Employee
+          <PlusCircle className="mr-2 h-4 w-4" /> Add New User
         </Button>
       </div>
       <Card>
@@ -105,30 +105,24 @@ export function EmployeeManager() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Name</TableHead>
+                <TableHead>Username</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead>Date Joined</TableHead>
-                <TableHead>Status</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {employees.length > 0 ? (
-                employees.map((employee) => (
-                  <TableRow key={employee.id}>
-                    <TableCell className="font-medium">{employee.name}</TableCell>
-                    <TableCell>{employee.role}</TableCell>
+              {users.length > 0 ? (
+                users.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-medium">{user.username}</TableCell>
+                    <TableCell>{user.role}</TableCell>
                      <TableCell>
-                        <div className="text-sm">{employee.email}</div>
-                        <div className="text-xs text-muted-foreground">{employee.phone}</div>
+                        <div className="text-sm">{user.email}</div>
+                        <div className="text-xs text-muted-foreground">{user.phone}</div>
                       </TableCell>
-                    <TableCell>{format(new Date(employee.dateJoined), "PPP")}</TableCell>
-                    <TableCell>
-                      <Badge variant={'default'} className={getStatusBadgeVariant(employee.status)}>
-                        {employee.status}
-                      </Badge>
-                    </TableCell>
+                    <TableCell>{format(new Date(user.dateJoined), "PPP")}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -138,9 +132,8 @@ export function EmployeeManager() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => toggleClockStatus(employee.id)}>Toggle Clock Status</DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleEdit(employee)}>Edit</DropdownMenuItem>
-                          <DropdownMenuItem className="text-red-500">Delete</DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEdit(user)}>Edit</DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-500" onClick={() => handleDelete(user.id)}>Delete</DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
@@ -148,8 +141,8 @@ export function EmployeeManager() {
                 ))
               ) : (
                 <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground">
-                        No employees found.
+                    <TableCell colSpan={5} className="text-center text-muted-foreground">
+                        No users found.
                     </TableCell>
                 </TableRow>
               )}
@@ -161,24 +154,25 @@ export function EmployeeManager() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle className="font-headline">{editingEmployee?.id ? "Edit Employee" : "Add New Employee"}</DialogTitle>
+            <DialogTitle className="font-headline">{editingUser?.id ? "Edit User" : "Add New User"}</DialogTitle>
+            <DialogDescription>Manage user details and role.</DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="name" className="text-right">Name</Label>
-              <Input id="name" defaultValue={editingEmployee?.name} className="col-span-3" />
+              <Label htmlFor="name" className="text-right">Username</Label>
+              <Input id="name" defaultValue={editingUser?.username} className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">Email</Label>
-              <Input id="email" type="email" defaultValue={editingEmployee?.email} className="col-span-3" />
+              <Input id="email" type="email" defaultValue={editingUser?.email} className="col-span-3" />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="phone" className="text-right">Phone</Label>
-              <Input id="phone" defaultValue={editingEmployee?.phone} className="col-span-3" />
+              <Input id="phone" defaultValue={editingUser?.phone} className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">Role</Label>
-              <Select defaultValue={editingEmployee?.role}>
+              <Select defaultValue={editingUser?.role}>
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
@@ -188,30 +182,9 @@ export function EmployeeManager() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-               <Label htmlFor="dateJoined" className="text-right">Date Joined</Label>
-               <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className={cn(
-                      "col-span-3 justify-start text-left font-normal",
-                      !date && "text-muted-foreground"
-                    )}
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {date ? format(date, "PPP") : <span>Pick a date</span>}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={date}
-                    onSelect={setDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="password" className="text-right">Password</Label>
+              <Input id="password" type="password" placeholder="Set a new password" className="col-span-3" />
             </div>
           </div>
           <DialogFooter>

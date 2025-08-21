@@ -1,23 +1,19 @@
-export type Drink = {
+
+export type Product = {
   id: string;
   name: string;
+  category: string;
+  quantity: number;
   costPrice: number;
-  sellingPrice: number;
-  stock: number; // For bottles, this is count. For drums, this is ml.
-  unit: 'bottle' | 'ml';
-  unitMl?: number; // e.g., 250 for a 250ml serving from a drum
+  price: number;
   barcode?: string;
   image?: string;
-  sold: number;
-  required: number;
-  received: number;
 };
 
-export type Employee = {
+export type User = {
   id: string;
-  name: string;
+  username: string;
   role: 'Admin' | 'Cashier';
-  status: 'Clocked In' | 'Clocked Out' | 'On Leave';
   email: string;
   phone: string;
   dateJoined: string; // ISO 8601 format
@@ -26,7 +22,7 @@ export type Employee = {
 export type Sale = {
   id: string;
   items: {
-    drinkName: string;
+    productName: string;
     quantity: number;
     price: number;
   }[];

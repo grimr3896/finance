@@ -26,13 +26,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { PlusCircle, MoreHorizontal } from "lucide-react";
 import {
   DropdownMenu,
@@ -41,7 +34,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator
 } from "@/components/ui/dropdown-menu";
-import type { Drink } from "@/lib/types";
+import type { Product } from "@/lib/types";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,106 +51,84 @@ import { cn } from "@/lib/utils";
 import { useAuth, ROLE } from "@/lib/auth";
 
 
-const initialDrinks: Drink[] = [];
+const initialProducts: Product[] = [];
 
 const LOW_STOCK_THRESHOLD = 10;
-const OUT_OF_STOCK_THRESHOLD = 5;
+const OUT_OF_STOCK_THRESHOLD = 0;
 
 export function InventoryManager() {
-  const [drinks, setDrinks] = useState<Drink[]>(initialDrinks);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editingDrink, setEditingDrink] = useState<Partial<Drink> | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
   const { user } = useAuth();
 
   const handleAddNew = () => {
-    setEditingDrink({});
+    setEditingProduct({});
     setIsDialogOpen(true);
   };
 
-  const handleEdit = (drink: Drink) => {
-    setEditingDrink(drink);
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
     setIsDialogOpen(true);
   };
 
   const handleDelete = (id: string) => {
-    setDrinks(drinks.filter((drink) => drink.id !== id));
+    setProducts(products.filter((product) => product.id !== id));
   };
   
   const handleSave = () => {
-    if (!editingDrink) return;
+    if (!editingProduct) return;
 
-    if (editingDrink.id) {
-      setDrinks(drinks.map(d => d.id === editingDrink.id ? editingDrink as Drink : d));
+    if (editingProduct.id) {
+      setProducts(products.map(p => p.id === editingProduct.id ? editingProduct as Product : p));
     } else {
-      const newDrink: Drink = {
-        id: `DRK${Date.now()}`,
-        ...editingDrink,
-      } as Drink;
-      setDrinks([...drinks, newDrink]);
+      const newProduct: Product = {
+        id: `PROD${Date.now()}`,
+        ...editingProduct,
+      } as Product;
+      setProducts([...products, newProduct]);
     }
     
     setIsDialogOpen(false);
-    setEditingDrink(null);
+    setEditingProduct(null);
   };
 
-  const handleFieldChange = (field: keyof Drink, value: string | number) => {
-    if(editingDrink) {
-      setEditingDrink(prev => ({ ...prev, [field]: value }));
+  const handleFieldChange = (field: keyof Product, value: string | number) => {
+    if(editingProduct) {
+      setEditingProduct(prev => ({ ...prev, [field]: value }));
     }
-  }
-
-  const handleReceivedChange = (drinkId: string, value: number) => {
-    setDrinks(drinks.map(d => d.id === drinkId ? { ...d, received: value } : d));
-  }
-
-  const handleRestock = (drinkId: string) => {
-    setDrinks(drinks.map(d => {
-      if (d.id === drinkId) {
-        return {
-          ...d,
-          stock: d.stock + d.received,
-          sold: 0,
-          required: 0,
-          received: 0
-        };
-      }
-      return d;
-    }));
   }
   
-  const sortedDrinks = useMemo(() => {
-    return [...drinks].sort((a, b) => a.name.localeCompare(b.name));
-  }, [drinks]);
+  const sortedProducts = useMemo(() => {
+    return [...products].sort((a, b) => a.name.localeCompare(b.name));
+  }, [products]);
 
-  const getStockStatus = (drink: Drink): { label: string; color: string } => {
-    if (drink.unit === 'ml') { // For drinks sold in ml, we assume they don't run out in the same way
-      return { label: 'Well Stocked', color: 'bg-emerald-600 text-emerald-50' };
-    }
-    if (drink.stock < OUT_OF_STOCK_THRESHOLD) {
+  const getStockStatus = (product: Product): { label: string; color: string } => {
+    if (product.quantity <= OUT_OF_STOCK_THRESHOLD) {
       return { label: 'Out of Stock', color: 'bg-red-600 text-red-50' };
     }
-    if (drink.stock < LOW_STOCK_THRESHOLD) {
+    if (product.quantity < LOW_STOCK_THRESHOLD) {
       return { label: 'Low Stock', color: 'bg-yellow-500 text-yellow-50' };
     }
-    return { label: 'Well Stocked', color: 'bg-emerald-600 text-emerald-50' };
+    return { label: 'In Stock', color: 'bg-emerald-600 text-emerald-50' };
   };
   
   if (!user) {
     return null; // Or a loading spinner
   }
 
-  const isCashier = user.role === ROLE.CASHIER;
+  const isAdmin = user.role === ROLE.ADMIN;
 
 
   return (
     <>
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-headline font-bold tracking-tight">Inventory</h2>
-          <p className="text-muted-foreground">Manage your bar's drink inventory.</p>
+          <h2 className="text-3xl font-headline font-bold tracking-tight">Product Management</h2>
+          <p className="text-muted-foreground">Manage your product inventory.</p>
         </div>
-        <Button onClick={handleAddNew} disabled={isCashier}>
-          <PlusCircle className="mr-2 h-4 w-4" /> Add New Drink
+        <Button onClick={handleAddNew} disabled={!isAdmin}>
+          <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
         </Button>
       </div>
       <Card>
@@ -166,72 +137,51 @@ export function InventoryManager() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>Stock Level</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>Quantity</TableHead>
+                <TableHead>Price (Ksh)</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Sold Today</TableHead>
-                <TableHead>Required</TableHead>
-                <TableHead>Received</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedDrinks.length > 0 ? (
-                sortedDrinks.map((drink) => {
-                  const status = getStockStatus(drink);
-                  const variance = drink.required - drink.received;
+              {sortedProducts.length > 0 ? (
+                sortedProducts.map((product) => {
+                  const status = getStockStatus(product);
                   return (
-                    <TableRow key={drink.id}>
-                      <TableCell className="font-medium">{drink.name}</TableCell>
-                      <TableCell>
-                        {drink.stock.toLocaleString()} {drink.unit}
-                        {drink.unit === 'ml' && drink.unitMl && ` (${(drink.stock / drink.unitMl).toFixed(0)} servings)`}
-                      </TableCell>
+                    <TableRow key={product.id}>
+                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell>{product.category}</TableCell>
+                      <TableCell>{product.quantity}</TableCell>
+                      <TableCell>{product.price.toFixed(2)}</TableCell>
                       <TableCell>
                         <Badge className={cn("hover:bg-opacity-80", status.color)}>{status.label}</Badge>
                       </TableCell>
-                       <TableCell>{drink.sold}</TableCell>
-                      <TableCell>{drink.required}</TableCell>
-                      <TableCell>
-                         <div className="flex items-center gap-2">
-                          <Input 
-                            type="number" 
-                            className="h-8 w-20" 
-                            value={drink.received}
-                            onChange={(e) => handleReceivedChange(drink.id, parseInt(e.target.value) || 0)}
-                          />
-                           {variance !== 0 && (
-                            <Badge variant={variance > 0 ? "destructive" : "secondary"}>
-                              {variance > 0 ? `Short ${variance}` : `Over ${Math.abs(variance)}`}
-                            </Badge>
-                          )}
-                        </div>
-                      </TableCell>
                       <TableCell className="text-right flex justify-end items-center gap-2">
-                        <Button size="sm" onClick={() => handleRestock(drink.id)}>Restock</Button>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
+                            <Button variant="ghost" className="h-8 w-8 p-0" disabled={!isAdmin}>
                               <span className="sr-only">Open menu</span>
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => handleEdit(drink)}>Edit</DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleEdit(product)} disabled={!isAdmin}>Edit</DropdownMenuItem>
                             <DropdownMenuSeparator />
                              <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()} disabled={isCashier}>Delete</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive" onSelect={(e) => e.preventDefault()} disabled={!isAdmin}>Delete</DropdownMenuItem>
                               </AlertDialogTrigger>
                               <AlertDialogContent>
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                                   <AlertDialogDescription>
-                                    This action cannot be undone. This will permanently delete the item from your inventory.
+                                    This action cannot be undone. This will permanently delete the product from your inventory.
                                   </AlertDialogDescription>
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                   <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                  <AlertDialogAction onClick={() => handleDelete(drink.id)} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+                                  <AlertDialogAction onClick={() => handleDelete(product.id)} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
                             </AlertDialog>
@@ -243,8 +193,8 @@ export function InventoryManager() {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center text-muted-foreground">
-                      No inventory items found. Add a new drink to get started.
+                  <TableCell colSpan={6} className="text-center text-muted-foreground">
+                      No products found. Add a new product to get started.
                   </TableCell>
                 </TableRow>
               )}
@@ -256,68 +206,52 @@ export function InventoryManager() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="font-headline">{editingDrink?.id ? "Edit Drink" : "Add New Drink"}</DialogTitle>
+            <DialogTitle className="font-headline">{editingProduct?.id ? "Edit Product" : "Add New Product"}</DialogTitle>
             <DialogDescription>
-              {editingDrink?.id ? "Update the details for this drink." : "Fill in the details for the new drink."}
+              {editingProduct?.id ? "Update the details for this product." : "Fill in the details for the new product."}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">Name</Label>
-              <Input id="name" value={editingDrink?.name || ''} onChange={(e) => handleFieldChange('name', e.target.value)} className="col-span-3" disabled={isCashier} />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="barcode" className="text-right">Barcode</Label>
-              <Input id="barcode" value={editingDrink?.barcode || ''} onChange={(e) => handleFieldChange('barcode', e.target.value)} className="col-span-3" disabled={isCashier} />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image" className="text-right">Image URL</Label>
-              <Input id="image" value={editingDrink?.image || ''} onChange={(e) => handleFieldChange('image', e.target.value)} className="col-span-3" disabled={isCashier} />
+              <Input id="name" value={editingProduct?.name || ''} onChange={(e) => handleFieldChange('name', e.target.value)} className="col-span-3" />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="unit" className="text-right">Unit</Label>
-              <Select value={editingDrink?.unit} onValueChange={(value) => handleFieldChange('unit', value)} disabled={isCashier}>
-                <SelectTrigger className="col-span-3">
-                  <SelectValue placeholder="Select unit type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bottle">Bottle</SelectItem>
-                  <SelectItem value="ml">Milliliters (ml)</SelectItem>
-                </SelectContent>
-              </Select>
+              <Label htmlFor="category" className="text-right">Category</Label>
+              <Input id="category" value={editingProduct?.category || ''} onChange={(e) => handleFieldChange('category', e.target.value)} className="col-span-3" />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="stock" className="text-right">Stock Level</Label>
-              <Input id="stock" type="number" value={editingDrink?.stock || ''} onChange={(e) => handleFieldChange('stock', +e.target.value)} className="col-span-3" />
+              <Label htmlFor="quantity" className="text-right">Quantity</Label>
+              <Input id="quantity" type="number" value={editingProduct?.quantity ?? ''} onChange={(e) => handleFieldChange('quantity', +e.target.value)} className="col-span-3" />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="costPrice" className="text-right">Cost Price (Ksh)</Label>
               <Input 
                 id="costPrice" 
                 type="number" 
-                value={editingDrink?.costPrice || ''} 
+                value={editingProduct?.costPrice ?? ''} 
                 onChange={(e) => handleFieldChange('costPrice', +e.target.value)} 
                 className="col-span-3"
-                disabled={isCashier}
               />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="sellingPrice" className="text-right">Selling Price (Ksh)</Label>
+              <Label htmlFor="price" className="text-right">Selling Price (Ksh)</Label>
               <Input 
-                id="sellingPrice" 
+                id="price" 
                 type="number" 
-                value={editingDrink?.sellingPrice || ''} 
-                onChange={(e) => handleFieldChange('sellingPrice', +e.target.value)} 
+                value={editingProduct?.price ?? ''} 
+                onChange={(e) => handleFieldChange('price', +e.target.value)} 
                 className="col-span-3"
-                disabled={isCashier}
               />
             </div>
-             {editingDrink?.unit === 'ml' && (
-               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="unitMl" className="text-right">Serving (ml)</Label>
-                <Input id="unitMl" type="number" value={editingDrink?.unitMl || ''} onChange={(e) => handleFieldChange('unitMl', +e.target.value)} className="col-span-3" disabled={isCashier} />
-              </div>
-            )}
+             <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="barcode" className="text-right">Barcode</Label>
+              <Input id="barcode" value={editingProduct?.barcode || ''} onChange={(e) => handleFieldChange('barcode', e.target.value)} className="col-span-3" />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="image" className="text-right">Image URL</Label>
+              <Input id="image" value={editingProduct?.image || ''} onChange={(e) => handleFieldChange('image', e.target.value)} className="col-span-3" />
+            </div>
           </div>
           <DialogFooter>
             <DialogClose asChild>
