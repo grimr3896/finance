@@ -12,6 +12,8 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
+  SidebarFooter,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { useState, useEffect } from "react";
 
@@ -43,16 +45,18 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarContent>
             <MainNav />
           </SidebarContent>
+           <SidebarFooter>
+              <SidebarSeparator />
+              <div className="p-2">
+                 <UserNav />
+              </div>
+           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
-          <header className="sticky top-0 z-10 flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:h-16 sm:px-6">
-            <SidebarTrigger className="md:hidden" />
-            <div className="flex-1">
-              {/* Can add breadcrumbs or page title here */}
-            </div>
-            <UserNav />
-          </header>
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <main className="relative flex-1 overflow-y-auto p-4 pt-16 sm:p-6 sm:pt-20 md:pt-6">
+             <div className="absolute top-4 left-4 sm:left-6 md:hidden">
+                <SidebarTrigger />
+             </div>
             {React.Children.map(children, child => {
                 if (React.isValidElement(child)) {
                     // @ts-ignore
