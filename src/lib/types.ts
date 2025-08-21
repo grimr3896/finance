@@ -22,14 +22,14 @@ export type User = {
 export type Sale = {
   id: string;
   items: {
-    productName: string;
+    drinkName: string;
     quantity: number;
     price: number;
   }[];
   total: number;
   paymentMethod: 'Cash' | 'Mpesa' | 'Card';
   cashier: string;
-  timestamp: string;
+  timestamp: string; // ISO 8601 format
   mpesaReceipt?: string;
   mpesaPhone?: string;
 };
@@ -38,5 +38,5 @@ export type Expense = {
   id:string;
   description: string;
   amount: number;
-  date: string;
+  date: string; // ISO 8601 format
 };

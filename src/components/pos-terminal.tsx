@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { PlusCircle, MinusCircle, Search, ScanBarcode, XCircle } from "lucide-react";
-import type { Drink, Sale } from "@/lib/types";
+import type { Product, Sale } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
@@ -36,11 +36,12 @@ import { Receipt } from "@/components/receipt";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useAuth } from "@/lib/auth";
+import Image from "next/image";
 
-const availableDrinks: Drink[] = [];
 
 type CartItem = {
-    drink: Drink;
+    product: Product;
     quantity: number;
 };
 
@@ -51,8 +52,10 @@ type CompletedSale = {
 }
 
 export function PosTerminal() {
+  const [products, setProducts] = useLocalStorage<Product[]>("products", []);
   const [cart, setCart] = useLocalStorage<CartItem[]>("pos-cart", []);
-  const [salesHistory, setSalesHistory] = useLocalStorage<CompletedSale[]>("pos-sales-history", []);
+  const [salesHistory, setSalesHistory] = useLocalStorage<Sale[]>("pos-sales-history", []);
+  const { user } = useAuth();
   
   const [searchTerm, setSearchTerm] = useState("");
   const [isCashoutOpen, setIsCashoutOpen] = useState(false);
@@ -73,53 +76,53 @@ export function PosTerminal() {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-        const scannedDrinkId = localStorage.getItem("scannedDrinkId");
-        if (scannedDrinkId) {
-            const drinkToAdd = availableDrinks.find(d => d.id === scannedDrinkId);
-            if (drinkToAdd) {
-                addToCart(drinkToAdd);
+        const scannedBarcode = localStorage.getItem("scannedBarcode");
+        if (scannedBarcode) {
+            const productToAdd = products.find(p => p.barcode === scannedBarcode);
+            if (productToAdd) {
+                addToCart(productToAdd);
             }
-            localStorage.removeItem("scannedDrinkId");
+            localStorage.removeItem("scannedBarcode");
         }
     }
-  }, []);
+  }, [products]);
 
-  const addToCart = (drink: Drink) => {
+  const addToCart = (product: Product) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.drink.id === drink.id);
+      const existingItem = prevCart.find((item) => item.product.id === product.id);
       if (existingItem) {
         return prevCart.map((item) =>
-          item.drink.id === drink.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prevCart, { drink, quantity: 1 }];
+      return [...prevCart, { product, quantity: 1 }];
     });
   };
 
-  const updateQuantity = (drinkId: string, newQuantity: number) => {
+  const updateQuantity = (productId: string, newQuantity: number) => {
     if (newQuantity <= 0) {
-      removeFromCart(drinkId);
+      removeFromCart(productId);
     } else {
       setCart((prevCart) =>
         prevCart.map((item) =>
-          item.drink.id === drinkId ? { ...item, quantity: newQuantity } : item
+          item.product.id === productId ? { ...item, quantity: newQuantity } : item
         )
       );
     }
   };
 
-  const removeFromCart = (drinkId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.drink.id !== drinkId));
+  const removeFromCart = (productId: string) => {
+    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
   };
   
   const clearCart = () => {
     setCart([]);
   }
 
-  const total = useMemo(() => cart.reduce((sum, item) => sum + item.drink.sellingPrice * item.quantity, 0), [cart]);
+  const total = useMemo(() => cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [cart]);
 
-  const filteredDrinks = availableDrinks.filter(drink => 
-    drink.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProducts = products.filter(product => 
+    product.name.toLowerCase().includes(searchTerm.toLowerCase()) && product.quantity > 0
   );
   
   const openCashoutModal = (method: "Cash" | "Card" | "Mpesa") => {
@@ -144,21 +147,36 @@ export function PosTerminal() {
   }
 
   const handleConfirmPayment = () => {
+    if (!user) {
+        toast({ variant: "destructive", title: "Error", description: "No user logged in." });
+        return;
+    }
+
     const sale: Sale = {
         id: `SALE${Date.now()}`,
         items: cart.map(item => ({
-            drinkName: item.drink.name,
+            drinkName: item.product.name,
             quantity: item.quantity,
-            price: item.drink.sellingPrice,
+            price: item.product.price,
         })),
         total,
         paymentMethod: paymentMethod!,
-        cashier: "John Doe", // Replace with actual logged in user
+        cashier: user.username,
         timestamp: new Date().toISOString(),
         mpesaReceipt: paymentMethod === 'Mpesa' ? mpesaCode : undefined,
         mpesaPhone: paymentMethod === 'Mpesa' ? mpesaPhone : undefined,
     };
     
+    // Update stock levels
+    const updatedProducts = products.map(p => {
+        const cartItem = cart.find(item => item.product.id === p.id);
+        if (cartItem) {
+            return { ...p, quantity: p.quantity - cartItem.quantity };
+        }
+        return p;
+    });
+    setProducts(updatedProducts);
+
     const completedSale: CompletedSale = {
       sale,
       cashReceived: paymentMethod === 'Cash' ? parseFloat(cashReceived) : total,
@@ -166,7 +184,7 @@ export function PosTerminal() {
     };
 
     setLastSale(completedSale);
-    setSalesHistory(prev => [completedSale, ...prev]);
+    setSalesHistory(prev => [sale, ...prev]);
     
     setCart([]);
     resetCashout();
@@ -201,11 +219,11 @@ export function PosTerminal() {
         <div className="lg:col-span-2">
           <Card className="h-full flex flex-col bg-card/50">
               <CardHeader>
-                  <CardTitle className="font-headline text-primary">Available Drinks</CardTitle>
+                  <CardTitle className="font-headline text-primary">Available Products</CardTitle>
                   <div className="relative mt-2 flex gap-2">
                       <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                       <Input 
-                          placeholder="Search for a drink..." 
+                          placeholder="Search for a product..." 
                           className="pl-8" 
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
@@ -216,29 +234,25 @@ export function PosTerminal() {
                   </div>
               </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 flex-1 overflow-y-auto p-4">
-              {filteredDrinks.length > 0 ? (
-                filteredDrinks.map((drink) => (
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
                     <Card
-                    key={drink.id}
-                    className="flex flex-col p-2 bg-[#800020] transition-opacity"
+                      key={product.id}
+                      onClick={() => addToCart(product)}
+                      className="cursor-pointer flex flex-col bg-card hover:border-primary transition-all overflow-hidden"
                     >
-                    <div className="flex-1 text-center">
-                        <p className="text-sm font-medium text-white">{drink.name}</p>
-                        <p className="text-xs text-black font-semibold">Ksh {drink.sellingPrice.toFixed(2)}</p>
-                    </div>
-                    <Button 
-                        variant="outline"
-                        size="sm"
-                        className="mt-2 w-full bg-white/20 text-white hover:bg-white/30 border-white/50"
-                        onClick={() => addToCart(drink)}
-                        >
-                        Order
-                        </Button>
+                      <div className="relative w-full aspect-square">
+                        <Image src={product.image || "https://placehold.co/100x100.png"} alt={product.name} layout="fill" objectFit="cover" data-ai-hint="beverage bottle" />
+                      </div>
+                      <div className="p-2 text-center flex-1 flex flex-col justify-between">
+                          <p className="text-sm font-medium">{product.name}</p>
+                          <p className="text-xs text-primary font-semibold">Ksh {product.price.toFixed(2)}</p>
+                      </div>
                     </Card>
                 ))
               ) : (
                 <div className="col-span-full flex items-center justify-center text-muted-foreground">
-                    No drinks in inventory. Please add items on the Inventory page.
+                    No products in inventory. Please add items on the Inventory page.
                 </div>
               )}
             </CardContent>
@@ -272,21 +286,21 @@ export function PosTerminal() {
                             </TableHeader>
                             <TableBody>
                             {cart.map((item) => (
-                                <TableRow key={item.drink.id}>
-                                <TableCell className="font-medium">{item.drink.name}</TableCell>
+                                <TableRow key={item.product.id}>
+                                <TableCell className="font-medium">{item.product.name}</TableCell>
                                 <TableCell>
                                     <div className="flex items-center gap-1">
-                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity - 1)}>
+                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.product.id, item.quantity - 1)}>
                                             <MinusCircle className="h-4 w-4" />
                                         </Button>
                                         <span className="w-6 text-center">{item.quantity}</span>
-                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.drink.id, item.quantity + 1)}>
+                                        <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => updateQuantity(item.product.id, item.quantity + 1)}>
                                             <PlusCircle className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 </TableCell>
                                 <TableCell className="text-right">
-                                    Ksh {(item.drink.sellingPrice * item.quantity).toFixed(2)}
+                                    Ksh {(item.product.price * item.quantity).toFixed(2)}
                                 </TableCell>
                                 </TableRow>
                             ))}
@@ -308,7 +322,7 @@ export function PosTerminal() {
                         </div>
                       ) : (
                         <div className="space-y-2">
-                          {salesHistory.map(({ sale }) => (
+                          {salesHistory.slice(0, 20).map((sale) => (
                             <div key={sale.id} className="flex justify-between items-center text-sm p-2 rounded-md hover:bg-muted/50">
                                 <div>
                                     <p className="font-mono text-xs">{sale.id}</p>

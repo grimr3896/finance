@@ -19,26 +19,42 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import type { Sale } from "@/lib/types";
-
-const recentSales: Sale[] = [];
-
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import { useAuth } from "@/lib/auth";
 
 export default function DashboardPage() {
+  const [sales] = useLocalStorage<Sale[]>("pos-sales-history", []);
   const [salesData, setSalesData] = useState<any[]>([]);
+  const { user } = useAuth();
+  
+  const totalRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
+  const totalSalesToday = sales.filter(sale => new Date(sale.timestamp).toDateString() === new Date().toDateString()).length;
+  
+  const topSeller = sales.flatMap(s => s.items)
+    .reduce((acc, item) => {
+        acc[item.drinkName] = (acc[item.drinkName] || 0) + item.quantity;
+        return acc;
+    }, {} as {[key: string]: number});
+
+  const topSellerName = Object.keys(topSeller).length > 0 ? Object.entries(topSeller).sort((a,b) => b[1] - a[1])[0][0] : "N/A";
+  const topSellerUnits = Object.keys(topSeller).length > 0 ? Object.entries(topSeller).sort((a,b) => b[1] - a[1])[0][1] : 0;
+
 
   useEffect(() => {
     // In a real app, you would fetch this data from your backend
     const initialSalesData = [
-      { name: "Mon", total: 0 },
-      { name: "Tue", total: 0 },
-      { name: "Wed", total: 0 },
-      { name: "Thu", total: 0 },
-      { name: "Fri", total: 0 },
-      { name: "Sat", total: 0 },
-      { name: "Sun", total: 0 },
+      { name: "Mon", total: Math.floor(Math.random() * 5000) },
+      { name: "Tue", total: Math.floor(Math.random() * 5000) },
+      { name: "Wed", total: Math.floor(Math.random() * 5000) },
+      { name: "Thu", total: Math.floor(Math.random() * 5000) },
+      { name: "Fri", total: Math.floor(Math.random() * 5000) },
+      { name: "Sat", total: Math.floor(Math.random() * 5000) },
+      { name: "Sun", total: Math.floor(Math.random() * 5000) },
     ];
     setSalesData(initialSalesData);
   }, []);
+
+  const recentSales = sales.slice(0, 5);
 
 
   return (
@@ -50,8 +66,8 @@ export default function DashboardPage() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">Ksh 0.00</div>
-            <p className="text-xs text-muted-foreground">No sales data yet</p>
+            <div className="text-2xl font-bold">Ksh {totalRevenue.toFixed(2)}</div>
+            <p className="text-xs text-muted-foreground">{sales.length} total transactions</p>
           </CardContent>
         </Card>
         <Card>
@@ -60,8 +76,8 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">0 Clocked in</p>
+            <div className="text-2xl font-bold">1</div>
+            <p className="text-xs text-muted-foreground">{user?.username} Clocked in</p>
           </CardContent>
         </Card>
         <Card>
@@ -70,8 +86,8 @@ export default function DashboardPage() {
             <Beer className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">N/A</div>
-            <p className="text-xs text-muted-foreground">0 units today</p>
+            <div className="text-2xl font-bold">{topSellerName}</div>
+            <p className="text-xs text-muted-foreground">{topSellerUnits} units sold</p>
           </CardContent>
         </Card>
         <Card>
@@ -80,8 +96,8 @@ export default function DashboardPage() {
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">0</div>
-            <p className="text-xs text-muted-foreground">No sales data yet</p>
+            <div className="text-2xl font-bold">+{totalSalesToday}</div>
+            <p className="text-xs text-muted-foreground">transactions today</p>
           </CardContent>
         </Card>
       </div>

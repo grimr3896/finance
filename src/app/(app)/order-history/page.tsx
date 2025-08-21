@@ -1,10 +1,9 @@
 
+"use client";
+
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   Table,
@@ -17,8 +16,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import type { Sale } from "@/lib/types";
 import { History } from "lucide-react";
-
-const sales: Sale[] = [];
+import { useLocalStorage } from "@/hooks/use-local-storage";
 
 const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -30,6 +28,8 @@ const formatDate = (dateString: string) => {
 
 
 export default function OrderHistoryPage() {
+  const [sales] = useLocalStorage<Sale[]>("pos-sales-history", []);
+
   return (
     <div className="space-y-6">
       <div>
