@@ -1,3 +1,4 @@
+
 "use client";
 import { useState, useEffect } from "react";
 import { DollarSign, Users, Beer, TrendingUp } from "lucide-react";
@@ -30,7 +31,7 @@ export default function DashboardPage() {
   const totalRevenue = sales.reduce((sum, sale) => sum + sale.total, 0);
   const totalSalesToday = sales.filter(sale => new Date(sale.timestamp).toDateString() === new Date().toDateString()).length;
   
-  const topSeller = sales.flatMap(s => s.items)
+  const topSeller = sales.flatMap(s => s.items || []) // Add a fallback for empty items
     .reduce((acc, item) => {
         acc[item.drinkName] = (acc[item.drinkName] || 0) + item.quantity;
         return acc;
@@ -43,13 +44,13 @@ export default function DashboardPage() {
   useEffect(() => {
     // In a real app, you would fetch this data from your backend
     const initialSalesData = [
-      { name: "Mon", total: Math.floor(Math.random() * 5000) },
-      { name: "Tue", total: Math.floor(Math.random() * 5000) },
-      { name: "Wed", total: Math.floor(Math.random() * 5000) },
-      { name: "Thu", total: Math.floor(Math.random() * 5000) },
-      { name: "Fri", total: Math.floor(Math.random() * 5000) },
-      { name: "Sat", total: Math.floor(Math.random() * 5000) },
-      { name: "Sun", total: Math.floor(Math.random() * 5000) },
+      { name: "Mon", total: 0 },
+      { name: "Tue", total: 0 },
+      { name: "Wed", total: 0 },
+      { name: "Thu", total: 0 },
+      { name: "Fri", total: 0 },
+      { name: "Sat", total: 0 },
+      { name: "Sun", total: 0 },
     ];
     setSalesData(initialSalesData);
   }, []);
@@ -159,7 +160,7 @@ export default function DashboardPage() {
                       <TableRow key={sale.id}>
                         <TableCell>
                           <div className="font-medium">{sale.cashier}</div>
-                          <div className="text-sm text-muted-foreground">{sale.items[0].drinkName}</div>
+                          <div className="text-sm text-muted-foreground">{sale.items[0]?.drinkName || 'N/A'}</div>
                         </TableCell>
                         <TableCell>
                           <Badge variant={sale.paymentMethod === 'Cash' ? 'secondary' : 'outline'}>
