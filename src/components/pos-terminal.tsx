@@ -119,7 +119,12 @@ export function PosTerminal() {
     setCart([]);
   }
 
-  const total = useMemo(() => cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [cart]);
+  const total = useMemo(() => cart.reduce((sum, item) => {
+    if (item && item.product && typeof item.product.price === 'number') {
+        return sum + item.product.price * item.quantity;
+    }
+    return sum;
+  }, 0), [cart]);
 
   const filteredProducts = products.filter(product => 
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) && product.quantity > 0
