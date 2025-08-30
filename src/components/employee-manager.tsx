@@ -42,11 +42,29 @@ import {
 import type { User } from "@/lib/types";
 import { format } from "date-fns";
 import { useAuth, ROLE } from "@/lib/auth";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 
-const initialUsers: User[] = [];
+const initialUsers: User[] = [
+    {
+      id: "USR001",
+      username: "Admin User",
+      role: "Admin",
+      email: "admin@barbuddy.app",
+      phone: "0712 345 678",
+      dateJoined: "2024-01-15T10:00:00Z",
+    },
+    {
+      id: "USR002",
+      username: "Cashier User",
+      role: "Cashier",
+      email: "cashier@barbuddy.app",
+      phone: "0787 654 321",
+      dateJoined: "2024-03-20T14:30:00Z",
+    },
+];
 
 export function EmployeeManager() {
-  const [users, setUsers] = useState<User[]>(initialUsers);
+  const [users, setUsers] = useLocalStorage<User[]>("users", initialUsers);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<Partial<User> | null>(null);
   const { user: currentUser } = useAuth();

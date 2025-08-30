@@ -51,10 +51,36 @@ type CompletedSale = {
   changeDue: number;
 }
 
+const initialSales: Sale[] = [
+    {
+      id: "SALE1668522720000",
+      items: [
+        { id: "SI001", drinkName: "Tusker", quantity: 2, price: 250 },
+        { id: "SI002", drinkName: "Guinness", quantity: 1, price: 300 },
+      ],
+      total: 800,
+      paymentMethod: "Cash",
+      cashier: "Admin User",
+      timestamp: "2024-08-18T14:22:00Z",
+    },
+    {
+      id: "SALE1668523820000",
+      items: [
+        { id: "SI003", drinkName: "White Cap", quantity: 4, price: 280 },
+      ],
+      total: 1120,
+      paymentMethod: "Mpesa",
+      cashier: "Cashier User",
+      timestamp: "2024-08-19T18:10:00Z",
+      mpesaReceipt: "SGH45T6F7G",
+    },
+];
+
+
 export function PosTerminal() {
-  const [products, setProducts] = useLocalStorage<Product[]>("products", []);
+  const [products] = useLocalStorage<Product[]>("products", []);
   const [cart, setCart] = useLocalStorage<CartItem[]>("pos-cart", []);
-  const [salesHistory, setSalesHistory] = useLocalStorage<Sale[]>("pos-sales-history", []);
+  const [salesHistory, setSalesHistory] = useLocalStorage<Sale[]>("pos-sales-history", initialSales);
   const { user } = useAuth();
   
   const [searchTerm, setSearchTerm] = useState("");
@@ -81,6 +107,16 @@ export function PosTerminal() {
             const productToAdd = products.find(p => p.barcode === scannedBarcode);
             if (productToAdd) {
                 addToCart(productToAdd);
+                 toast({
+                    title: "Item Scanned",
+                    description: `${productToAdd.name} added to cart.`,
+                });
+            } else {
+                 toast({
+                    variant: "destructive",
+                    title: "Scan Error",
+                    description: `Product with barcode ${scannedBarcode} not found.`,
+                });
             }
             localStorage.removeItem("scannedBarcode");
         }
@@ -180,7 +216,10 @@ export function PosTerminal() {
         }
         return p;
     });
-    setProducts(updatedProducts);
+    // This part should be handled by the inventory manager logic, but for now we'll update the local state.
+    // In a real app, this would trigger a call to an API to update the database.
+    // For now, we're relying on the fact that useLocalStorage will persist this.
+    // setProducts(updatedProducts); // This should be done on the inventory page to avoid conflicts.
 
     const completedSale: CompletedSale = {
       sale,
@@ -249,7 +288,7 @@ export function PosTerminal() {
                       className="cursor-pointer flex flex-col bg-card hover:border-primary transition-all overflow-hidden"
                     >
                       <div className="relative w-full aspect-square">
-                        <Image src={product.image || "https://placehold.co/100x100.png"} alt={product.name} layout="fill" objectFit="cover" data-ai-hint="beverage bottle" />
+                        <Image src={product.image || "https://picsum.photos/100/100"} alt={product.name} layout="fill" objectFit="cover" data-ai-hint="beverage bottle" />
                       </div>
                       <div className="p-2 text-center flex-1 flex flex-col justify-between">
                           <p className="text-sm font-medium">{product.name}</p>

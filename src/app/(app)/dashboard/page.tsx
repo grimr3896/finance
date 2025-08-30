@@ -23,10 +23,16 @@ import type { Sale } from "@/lib/types";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 import { useAuth } from "@/lib/auth";
 
+const getDayOfWeek = (dateString: string) => {
+    const date = new Date(dateString);
+    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    return days[date.getDay()];
+}
+
 export default function DashboardPage() {
   const [sales] = useLocalStorage<Sale[]>("pos-sales-history", []);
   const [salesData, setSalesData] = useState<any[]>([]);
-  const { user } = useAuth();
+  const { user, users: allUsers } = useAuth();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
@@ -34,18 +40,28 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    // In a real app, you would fetch this data from your backend
-    const initialSalesData = [
-      { name: "Mon", total: 0 },
-      { name: "Tue", total: 0 },
-      { name: "Wed", total: 0 },
-      { name: "Thu", total: 0 },
-      { name: "Fri", total: 0 },
-      { name: "Sat", total: 0 },
-      { name: "Sun", total: 0 },
-    ];
-    setSalesData(initialSalesData);
-  }, []);
+      if (isClient) {
+        const weeklySales = [
+            { name: "Mon", total: 0 },
+            { name: "Tue", total: 0 },
+            { name: "Wed", total: 0 },
+            { name: "Thu", total: 0 },
+            { name: "Fri", total: 0 },
+            { name: "Sat", total: 0 },
+            { name: "Sun", total: 0 },
+        ];
+
+        sales.forEach(sale => {
+            const dayName = getDayOfWeek(sale.timestamp);
+            const dayData = weeklySales.find(d => d.name === dayName);
+            if (dayData) {
+                dayData.total += sale.total;
+            }
+        });
+        
+        setSalesData(weeklySales);
+      }
+  }, [sales, isClient]);
   
   if (!isClient) {
     return null; // or a loading skeleton
@@ -87,8 +103,8 @@ export default function DashboardPage() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">1</div>
-            <p className="text-xs text-muted-foreground">{user?.username} Clocked in</p>
+            <div className="text-2xl font-bold">{allUsers.length}</div>
+            <p className="text-xs text-muted-foreground">{user?.username} currently active</p>
           </CardContent>
         </Card>
         <Card>

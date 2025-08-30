@@ -8,23 +8,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ScanBarcode, ArrowLeft } from "lucide-react";
+import { useLocalStorage } from "@/hooks/use-local-storage";
+import type { Product } from "@/lib/types";
 
-// Mock barcode data for available drinks
-const barcodeToDrinkId: { [key: string]: string } = {
-  "6161101410202": "DRK001", // Tusker
-  "6161100110103": "DRK002", // Guinness
-  "6161100110301": "DRK003", // White Cap
-  "0": "DRK004", // Draft Beer
-  "1": "DRK005", // Drum
-  "8712000030393": "DRK006", // Heineken
-  "6161100110202": "DRK007", // Pilsner
-};
 
 export function BarcodeScanner() {
   const router = useRouter();
   const { toast } = useToast();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [products] = useLocalStorage<Product[]>("products", []);
+
 
   useEffect(() => {
     const getCameraPermission = async () => {
@@ -70,22 +64,26 @@ export function BarcodeScanner() {
   const handleScan = () => {
     // In a real application, you would use a barcode scanning library (e.g., ZXing, Scandit)
     // to decode the video stream from the camera.
-    // For this prototype, we'll simulate a scan with a random barcode.
-    const barcodes = Object.keys(barcodeToDrinkId);
-    const randomBarcode = barcodes[Math.floor(Math.random() * barcodes.length)];
-    const drinkId = barcodeToDrinkId[randomBarcode];
-
-    // Store the scanned drink ID in local storage to be picked up by the POS page
-    if (typeof window !== 'undefined') {
-        localStorage.setItem("scannedDrinkId", drinkId);
+    // For this prototype, we'll simulate a scan with a random barcode from available products.
+    const availableProducts = products.filter(p => p.barcode);
+    if (availableProducts.length === 0) {
+        toast({
+            variant: "destructive",
+            title: "No Products with Barcodes",
+            description: "There are no products with barcodes in the inventory.",
+        });
+        return;
     }
-
-    toast({
-      title: "Item Scanned",
-      description: `Added item with barcode ${randomBarcode} to cart.`,
-    });
     
-    // Redirect back to the POS page
+    const randomProduct = availableProducts[Math.floor(Math.random() * availableProducts.length)];
+    const barcode = randomProduct.barcode;
+
+    // Store the scanned barcode in local storage to be picked up by the POS page
+    if (typeof window !== 'undefined' && barcode) {
+        localStorage.setItem("scannedBarcode", barcode);
+    }
+    
+    // Redirect back to the POS page, which will handle adding the item
     router.push("/pos");
   };
 

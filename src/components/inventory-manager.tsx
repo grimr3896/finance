@@ -49,15 +49,24 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useAuth, ROLE } from "@/lib/auth";
+import { useLocalStorage } from "@/hooks/use-local-storage";
 
 
-const initialProducts: Product[] = [];
+const initialProducts: Product[] = [
+    { id: "DRK001", name: "Tusker", category: "Beer", quantity: 50, costPrice: 150, price: 250, barcode: "6161101410202", image: "https://picsum.photos/100/100?random=1" },
+    { id: "DRK002", name: "Guinness", category: "Beer", quantity: 30, costPrice: 180, price: 300, barcode: "6161100110103", image: "https://picsum.photos/100/100?random=2" },
+    { id: "DRK003", name: "White Cap", category: "Beer", quantity: 40, costPrice: 160, price: 280, barcode: "6161100110301", image: "https://picsum.photos/100/100?random=3" },
+    { id: "DRK004", name: "Draft Beer", category: "Beer", quantity: 100, costPrice: 80, price: 150, barcode: "0", image: "https://picsum.photos/100/100?random=4" },
+    { id: "DRK005", name: "Drum", category: "Spirit", quantity: 20, costPrice: 500, price: 800, barcode: "1", image: "https://picsum.photos/100/100?random=5" },
+    { id: "DRK006", name: "Heineken", category: "Beer", quantity: 25, costPrice: 200, price: 350, barcode: "8712000030393", image: "https://picsum.photos/100/100?random=6" },
+    { id: "DRK007", name: "Pilsner", category: "Beer", quantity: 45, costPrice: 150, price: 250, barcode: "6161100110202", image: "https://picsum.photos/100/100?random=7" },
+];
 
 const LOW_STOCK_THRESHOLD = 10;
 const OUT_OF_STOCK_THRESHOLD = 0;
 
 export function InventoryManager() {
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [products, setProducts] = useLocalStorage<Product[]>("products", initialProducts);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Partial<Product> | null>(null);
   const { user } = useAuth();
