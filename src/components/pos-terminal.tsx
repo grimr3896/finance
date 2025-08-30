@@ -214,6 +214,8 @@ export function PosTerminal() {
     return received - total;
   }, [cashReceived, total, paymentMethod]);
 
+  const validCart = useMemo(() => cart.filter(item => item && item.product), [cart]);
+
   if (!isMounted) {
     return null; // or a loading spinner
   }
@@ -275,7 +277,7 @@ export function PosTerminal() {
               </CardHeader>
               <div className="flex-1 overflow-y-auto">
                 <TabsContent value="order" className="m-0 p-2 h-full">
-                    {cart.length === 0 ? (
+                    {validCart.length === 0 ? (
                         <div className="flex h-full items-center justify-center">
                             <p className="text-muted-foreground">Cart is empty</p>
                         </div>
@@ -290,7 +292,7 @@ export function PosTerminal() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                            {cart.map((item) => (
+                            {validCart.map((item) => (
                                 <TableRow key={item.product.id}>
                                 <TableCell className="font-medium">{item.product.name}</TableCell>
                                 <TableCell>
