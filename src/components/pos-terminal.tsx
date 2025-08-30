@@ -125,13 +125,14 @@ export function PosTerminal() {
 
   const addToCart = (product: Product) => {
     setCart((prevCart) => {
-      const existingItem = prevCart.find((item) => item.product.id === product.id);
+      const validPrevCart = prevCart.filter(item => item && item.product);
+      const existingItem = validPrevCart.find((item) => item.product.id === product.id);
       if (existingItem) {
-        return prevCart.map((item) =>
+        return validPrevCart.map((item) =>
           item.product.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
-      return [...prevCart, { product, quantity: 1 }];
+      return [...validPrevCart, { product, quantity: 1 }];
     });
   };
 
@@ -141,26 +142,29 @@ export function PosTerminal() {
     } else {
       setCart((prevCart) =>
         prevCart.map((item) =>
-          item.product.id === productId ? { ...item, quantity: newQuantity } : item
-        )
+          item && item.product && item.product.id === productId ? { ...item, quantity: newQuantity } : item
+        ).filter(Boolean) as CartItem[]
       );
     }
   };
 
   const removeFromCart = (productId: string) => {
-    setCart((prevCart) => prevCart.filter((item) => item.product.id !== productId));
+    setCart((prevCart) => prevCart.filter((item) => item && item.product && item.product.id !== productId));
   };
   
   const clearCart = () => {
     setCart([]);
   }
 
-  const total = useMemo(() => cart.reduce((sum, item) => {
-    if (item && item.product && typeof item.product.price === 'number') {
+  const total = useMemo(() => {
+    return cart.reduce((sum, item) => {
+      if (item && item.product && typeof item.product.price === 'number') {
         return sum + item.product.price * item.quantity;
-    }
-    return sum;
-  }, 0), [cart]);
+      }
+      return sum;
+    }, 0);
+  }, [cart]);
+
 
   const filteredProducts = products.filter(product => 
     product.name.toLowerCase().includes(searchTerm.toLowerCase()) && product.quantity > 0
@@ -288,7 +292,7 @@ export function PosTerminal() {
                       className="cursor-pointer flex flex-col bg-card hover:border-primary transition-all overflow-hidden"
                     >
                       <div className="relative w-full aspect-square">
-                        <Image src={product.image || "https://picsum.photos/100/100"} alt={product.name} layout="fill" objectFit="cover" data-ai-hint="beverage bottle" />
+                        <Image src={product.image || "https://picsum.photos/100/100"} alt={product.name} fill objectFit="cover" data-ai-hint="beverage bottle" />
                       </div>
                       <div className="p-2 text-center flex-1 flex flex-col justify-between">
                           <p className="text-sm font-medium">{product.name}</p>
