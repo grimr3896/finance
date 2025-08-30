@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -275,8 +276,34 @@ export function InventoryManager() {
               <Input id="barcode" value={editingProduct?.barcode || ''} onChange={(e) => handleFieldChange('barcode', e.target.value)} className="col-span-3" />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="image" className="text-right">Image URL</Label>
-              <Input id="image" value={editingProduct?.image || ''} onChange={(e) => handleFieldChange('image', e.target.value)} className="col-span-3" />
+              <Label htmlFor="image-upload" className="text-right">Image</Label>
+              <div className="col-span-3 flex items-center gap-2">
+                {editingProduct?.image && (
+                    <Image 
+                        src={editingProduct.image} 
+                        alt={editingProduct.name || 'Product Image'} 
+                        width={40} 
+                        height={40} 
+                        className="rounded-md object-cover"
+                    />
+                )}
+                <Input 
+                  id="image-upload" 
+                  type="file"
+                  accept="image/*"
+                  className="text-xs"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        handleFieldChange('image', reader.result as string);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+              </div>
             </div>
           </div>
           <DialogFooter>
@@ -290,5 +317,3 @@ export function InventoryManager() {
     </>
   );
 }
-
-    
