@@ -70,7 +70,13 @@ export function EmployeeManager() {
   const { user: currentUser } = useAuth();
 
   const handleAddNew = () => {
-    setEditingUser({ dateJoined: new Date().toISOString() });
+    setEditingUser({ 
+        dateJoined: new Date().toISOString(),
+        username: "",
+        email: "",
+        phone: "",
+        role: undefined,
+    });
     setIsDialogOpen(true);
   };
   
@@ -82,9 +88,16 @@ export function EmployeeManager() {
   const handleDelete = (id: string) => {
     setUsers(users.filter(user => user.id !== id));
   };
+  
+  const handleFieldChange = (field: keyof User, value: string) => {
+      if (editingUser) {
+        setEditingUser({ ...editingUser, [field]: value });
+      }
+  };
 
   const handleSave = () => {
-    if (!editingUser) return;
+    if (!editingUser || !editingUser.username || !editingUser.role) return;
+
     if (editingUser.id) {
         setUsers(users.map(u => u.id === editingUser.id ? editingUser as User : u));
     } else {
@@ -178,19 +191,38 @@ export function EmployeeManager() {
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="name" className="text-right">Username</Label>
-              <Input id="name" defaultValue={editingUser?.username} className="col-span-3" />
+              <Input 
+                id="name" 
+                value={editingUser?.username || ''} 
+                onChange={(e) => handleFieldChange('username', e.target.value)}
+                className="col-span-3" 
+              />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="email" className="text-right">Email</Label>
-              <Input id="email" type="email" defaultValue={editingUser?.email} className="col-span-3" />
+              <Input 
+                id="email" 
+                type="email" 
+                value={editingUser?.email || ''} 
+                onChange={(e) => handleFieldChange('email', e.target.value)}
+                className="col-span-3" 
+              />
             </div>
              <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="phone" className="text-right">Phone</Label>
-              <Input id="phone" defaultValue={editingUser?.phone} className="col-span-3" />
+              <Input 
+                id="phone" 
+                value={editingUser?.phone || ''} 
+                onChange={(e) => handleFieldChange('phone', e.target.value)}
+                className="col-span-3" 
+               />
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="role" className="text-right">Role</Label>
-              <Select defaultValue={editingUser?.role}>
+              <Select 
+                value={editingUser?.role}
+                onValueChange={(value) => handleFieldChange('role', value)}
+              >
                 <SelectTrigger className="col-span-3">
                   <SelectValue placeholder="Select a role" />
                 </SelectTrigger>
