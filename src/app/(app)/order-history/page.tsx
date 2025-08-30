@@ -76,7 +76,7 @@ export default function OrderHistoryPage() {
                                     </Badge>
                                     {sale.mpesaReceipt && <div className="text-xs text-muted-foreground mt-1">{sale.mpesaReceipt}</div>}
                                 </TableCell>
-                                <TableCell className="text-right font-semibold">Ksh {sale.total.toFixed(2)}</TableCell>
+                                <TableCell className="text-right font-semibold">Ksh {(sale.total || 0).toFixed(2)}</TableCell>
                             </TableRow>
                         ))
                     ) : (
