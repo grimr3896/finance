@@ -38,8 +38,10 @@ export type Sale = {
 };
 
 export type Expense = {
-  id:string;
-  description: string;
+  id: string;
+  name: string;
+  category: string;
   amount: number;
   date: string; // ISO 8601 format
+  paymentMethod: 'Cash' | 'Mpesa' | 'Card';
 };
