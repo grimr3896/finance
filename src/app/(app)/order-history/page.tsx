@@ -19,11 +19,16 @@ import { History } from "lucide-react";
 import { useLocalStorage } from "@/hooks/use-local-storage";
 
 const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        return "Invalid Date";
+    }
     const options: Intl.DateTimeFormatOptions = {
         year: 'numeric', month: 'short', day: 'numeric',
         hour: '2-digit', minute: '2-digit'
     };
-    return new Intl.DateTimeFormat('en-US', options).format(new Date(dateString));
+    return new Intl.DateTimeFormat('en-US', options).format(date);
 }
 
 
