@@ -335,7 +335,7 @@ export function PosTerminal() {
                                     <p className="font-mono text-xs">{sale.id}</p>
                                     <p className="text-muted-foreground text-xs">{new Date(sale.timestamp).toLocaleTimeString()}</p>
                                 </div>
-                                <p className="font-semibold text-primary">Ksh {sale.total.toFixed(2)}</p>
+                                <p className="font-semibold text-primary">Ksh {(sale.total || 0).toFixed(2)}</p>
                             </div>
                           ))}
                         </div>
