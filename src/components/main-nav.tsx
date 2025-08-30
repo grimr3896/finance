@@ -8,13 +8,9 @@ import {
   Beer,
   Users,
   BarChart3,
-  BrainCircuit,
-  ShieldAlert,
   ShoppingCart,
-  MessageSquare,
   Settings,
   History,
-  Mail,
 } from "lucide-react";
 
 import {
@@ -62,30 +58,6 @@ const allLinks = [
     allowedRoles: [ROLE.ADMIN],
   },
   {
-    href: "/forecasting",
-    label: "AI Forecasting",
-    icon: BrainCircuit,
-    allowedRoles: [ROLE.ADMIN],
-  },
-  {
-    href: "/anomaly-detection",
-    label: "Anomaly Detection",
-    icon: ShieldAlert,
-    allowedRoles: [ROLE.ADMIN],
-  },
-  {
-    href: "/admin-command",
-    label: "Admin Command",
-    icon: Mail,
-    allowedRoles: [ROLE.ADMIN],
-  },
-  {
-    href: "/customer-support",
-    label: "Customer Support",
-    icon: MessageSquare,
-    allowedRoles: [ROLE.ADMIN, ROLE.CASHIER],
-  },
-    {
     href: "/settings",
     label: "Settings",
     icon: Settings,
