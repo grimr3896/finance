@@ -20,7 +20,7 @@ export function Receipt({ sale, cashReceived, changeDue }: ReceiptProps) {
     }
 
   return (
-    <div id="receipt-content" className="bg-background text-foreground font-mono text-sm p-4">
+    <div className="bg-background text-foreground font-mono text-sm p-4">
       <div className="text-center mb-4">
         <h2 className="text-lg font-bold font-headline">Galaxy Inn</h2>
         <p>Tel: 0712 345 678</p>

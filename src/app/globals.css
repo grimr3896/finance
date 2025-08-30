@@ -89,10 +89,10 @@
   body * {
     visibility: hidden;
   }
-  #receipt-dialog, #receipt-dialog * {
+  #printable-receipt, #printable-receipt * {
     visibility: visible;
   }
-  #receipt-dialog {
+  #printable-receipt {
     position: absolute;
     left: 0;
     top: 0;
@@ -100,8 +100,12 @@
     max-width: 100%;
     border: none;
     box-shadow: none;
+    padding: 0;
+    margin: 0;
+    color: black;
+    background-color: white;
   }
-  #receipt-content {
-     color: black; /* Ensure text is visible on white paper */
+  .no-print {
+    display: none;
   }
 }

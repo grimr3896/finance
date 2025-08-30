@@ -481,12 +481,14 @@ export function PosTerminal() {
       </Dialog>
       
        <Dialog open={isReceiptOpen} onOpenChange={setIsReceiptOpen}>
-        <DialogContent className="sm:max-w-sm" id="receipt-dialog">
-            <DialogHeader>
-                <DialogTitle className="font-headline text-primary">Transaction Receipt</DialogTitle>
-            </DialogHeader>
-            {lastSale && <Receipt sale={lastSale.sale} cashReceived={lastSale.cashReceived} changeDue={lastSale.changeDue} />}
-            <DialogFooter>
+        <DialogContent className="sm:max-w-sm" >
+            <div id="printable-receipt">
+                <DialogHeader>
+                    <DialogTitle className="font-headline text-primary">Transaction Receipt</DialogTitle>
+                </DialogHeader>
+                {lastSale && <Receipt sale={lastSale.sale} cashReceived={lastSale.cashReceived} changeDue={lastSale.changeDue} />}
+            </div>
+            <DialogFooter className="no-print">
                 <Button type="button" variant="outline" onClick={() => setIsReceiptOpen(false)}>Close</Button>
                 <Button type="button" onClick={handlePrint}>Print</Button>
             </DialogFooter>
